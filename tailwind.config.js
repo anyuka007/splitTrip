@@ -7,11 +7,12 @@ module.exports = {
     extend: {
       colors: {
         primary: "#9AC1F0",
-        secondary: "#72fa93",
+        secondary: "#f6c445", 
         tertiary: "#e45f2b",
-        "myYellow": "#f6c445",
         "myGreen": "#a0e548",
-        "myBlue": "#DADCE9",
+        "lightGreen": "#72fa93",
+        "myGray": "#798086", 
+        "grayGreen": "#9dbf9e"
       },
       fontFamily: {
         quicksand: ["Quicksand-Regular", "sans-serif"],

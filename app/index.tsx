@@ -17,18 +17,19 @@ const trips = [
 export default function Index() {
   return (
     <SafeAreaView className="flex-1 bg-white mx-3">
-
-      <View className="flex flex-row items-center justify-between my-3">
-        <Text className="text-lg font-quicksand-bold text-primary">
+      
+        <Text className="h1 text-center text-secondary">
           Your Trips
         </Text>
-        <Pressable className="bg-primary rounded-full p-2">
-          <Ionicons name="exit-outline" size={24} color="black" />
+        <View className="flex flex-row items-center justify-between my-3">
+          <Text>{`You have ${trips.length} trips`}</Text>
+          <Pressable className="bg-myYellow rounded-full p-2" onPress={() => alert('Logout')}>
+          <Ionicons name="exit-outline" size={24} color="white" />
         </Pressable>
+        
       </View>
 
-      <Text>{`You have ${trips.length} trips`}</Text>
-
+  
       <CustomButton text="Add New Trip" onPress={() => alert('Add New Trip')} />
 
       <FlatList
