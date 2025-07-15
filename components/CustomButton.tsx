@@ -5,19 +5,27 @@ interface CustomButtonProps {
     text: string;
     onPress?: () => void;
     classname?: string;
-    color?: string;
-    height?: number | string;
-    width?: number | string;
+    disabled?: boolean
 }
 
 
-const CustomButton = ({ text = "Click Me", onPress, color = "primary", height = 16, width = "full" }: CustomButtonProps) => {
+const CustomButton = ({ text = "Click Me", onPress, classname, disabled=false }: CustomButtonProps) => {
+
+    const defaultClassName = "bg-primary w-full h-12 flex items-center justify-center rounded-xl my-2";
+
+    const buttonClassName = classname || defaultClassName;
+
     return (
-        <TouchableOpacity onPress={onPress} className={`bg-${color} h-${height} w-${width} flex items-center justify-center rounded-xl p-2 my-2`}>
-            <Text className="text-white text-center">{text}</Text>
+         <TouchableOpacity 
+            onPress={onPress} 
+            className={buttonClassName}
+            disabled={disabled}
+            style={{ opacity: disabled ? 0.5 : 1 }}
+        >
+            <Text className="h3 text-white text-center ">{text}</Text>
         </TouchableOpacity>
     );
-}
+};
 
 const styles = StyleSheet.create({})
 

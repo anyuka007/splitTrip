@@ -2,6 +2,7 @@ import CustomButton from '@/components/CustomButton';
 import Avatar from '../components/Avatar';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FlatList, Pressable, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { Fragment } from 'react';
 
 const trips = [
   { id: "1", title: "Trip to Paris", startDate: "2023-10-01", endDate: "2023-10-10", participants: ["Alice Braun", "Bob"] },
@@ -17,20 +18,19 @@ const trips = [
 export default function Index() {
   return (
     <SafeAreaView className="flex-1 bg-white mx-3">
-      
-        <Text className="h1 text-center text-secondary">
-          Your Trips
-        </Text>
-        <View className="flex flex-row items-center justify-between my-3">
-          <Text>{`You have ${trips.length} trips`}</Text>
-          <Pressable className="bg-myYellow rounded-full p-2" onPress={() => alert('Logout')}>
-          <Ionicons name="exit-outline" size={24} color="white" />
-        </Pressable>
-        
-      </View>
 
-  
-      <CustomButton text="Add New Trip" onPress={() => alert('Add New Trip')} />
+<Fragment>
+            <Text className="h1 text-center text-secondary">
+              Your Trips
+            </Text>
+            <View className="flex flex-row items-center justify-between my-3">
+              <Text className='h3'>{`You have ${trips.length} trips`}</Text>
+              <Pressable className="bg-tertiary rounded-full p-2" onPress={() => alert('Logout')}>
+                <Ionicons name="exit-outline" size={24} color="white" />
+              </Pressable>
+            </View>
+            <CustomButton text="Add New Trip" onPress={() => alert('Add New Trip')} />
+          </Fragment>
 
       <FlatList
         data={trips}
@@ -49,16 +49,16 @@ export default function Index() {
                   elevation: 5, // für Android
                 }}>
                 <View>
-                  <Text className="text-xl ">
+                  <Text className="h2">
                     {item.title}
                   </Text>
-                  <Text className="text-sm ">
+                  <Text className="text-regular text-xs">
                     {`${item.startDate} - ${item.endDate}`}
                   </Text>
                 </View>
 
                 <View className='flex flex-row items-center justify-between'>
-                  <Text>
+                  <Text className='h3'>
                     Participants: </Text>
                   <View className=' flex-row justify-end items-center h-12'>
                     {item.participants.map((participant, index) => (
@@ -73,15 +73,14 @@ export default function Index() {
         }
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={{ paddingBottom: 30 }}
+        
 
         ListFooterComponent={() => (
-          <View className="flex-center mt-5">
-            <Text className="paragraph-regular text-gray-100">Powered by Expo Router</Text>
+          <View className="flex justify-center items-center mt-5">
+            <Text className="text-regular text-xs text-myGray ">Developed with ❤️ by Anna Popova</Text>
           </View>
         )}
       />
-
-
 
     </SafeAreaView>
   );

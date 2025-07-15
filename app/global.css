@@ -2,14 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-
-  body {
-    @apply font-quicksand;
-  }
-  
+ 
 
 .h1 {
-  @apply text-3xl font-bold;
+  @apply text-3xl font-quicksand-bold;
+}
+
+.h2 {
+  @apply text-xl font-quicksand-semibold;
+}
+
+.h3 {
+  @apply text-lg font-quicksand-medium;
+}
+
+.h4 {
+  @apply text-base font-quicksand-medium;
+}
+
+.text-regular {
+  @apply font-quicksand;
 }
 
 .trip-card__info {
