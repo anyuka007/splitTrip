@@ -6,10 +6,11 @@ interface CustomButtonProps {
     onPress?: () => void;
     classname?: string;
     disabled?: boolean
+    isLoading?: boolean;
 }
 
 
-const CustomButton = ({ text = "Click Me", onPress, classname, disabled=false }: CustomButtonProps) => {
+const CustomButton = ({ text = "Click Me", onPress, classname, disabled=false, isLoading=false }: CustomButtonProps) => {
 
     const defaultClassName = "bg-primary w-full h-12 flex items-center justify-center rounded-xl my-2";
 
