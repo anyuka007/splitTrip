@@ -1,8 +1,8 @@
 import CustomButton from '@/components/CustomButton';
-import Avatar from '../components/Avatar';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FlatList, Pressable, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import { Fragment } from 'react';
+import Avatar from '@/components/Avatar';
 
 const trips = [
   { id: "1", title: "Trip to Paris", startDate: "2023-10-01", endDate: "2023-10-10", participants: ["Alice Braun", "Bob"] },
