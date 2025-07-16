@@ -3,6 +3,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { FlatList, Pressable, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import { Fragment } from 'react';
 import Avatar from '@/components/Avatar';
+import useAuthStore from '@/store/auth.store';
 
 const trips = [
   { id: "1", title: "Trip to Paris", startDate: "2023-10-01", endDate: "2023-10-10", participants: ["Alice Braun", "Bob"] },
@@ -16,6 +17,8 @@ const trips = [
 
 
 export default function Index() {
+  const { user } = useAuthStore();
+  //console.log("CurrentUser: ", JSON.stringify(user, null, 2)); 
   return (
     <SafeAreaView className="flex-1 bg-white mx-3">
 

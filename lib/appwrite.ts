@@ -1,5 +1,5 @@
 import SignIn from '@/app/(auth)/sign-in';
-import { Account, Client, Databases, ID } from 'react-native-appwrite';
+import { Account, Client, Databases, ID, Query } from 'react-native-appwrite';
 
 export const appwriteConfig = {
     endpoint: process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT,
@@ -41,7 +41,8 @@ export const createUser = async ({email, password, name }: CreateUserParams ) =>
             appwriteConfig.databaseId!,
             appwriteConfig.userCollectionId!,
             ID.unique(),
-            {accountId: newAccount.$id, email, name}
+            {accountId: newAccount.$id, // connects user with account
+                 email, name}
         );
 
         return newUser;
@@ -65,5 +66,25 @@ export const signIn = async ({ email, password }: SignInParams) => {
         console.error("Error signing in:", error);
         throw error;
         
+    }
+}
+
+export const getCurrentUser = async () => {
+    try {
+        const currentAccount = await account.get();
+        if (!currentAccount) {
+            throw new Error("No user is currently signed in");
+        }
+        const currentUser = await databases.listDocuments(
+            appwriteConfig.databaseId!,
+            appwriteConfig.userCollectionId!,
+            [Query.equal("accountId", currentAccount.$id)])
+
+        if(!currentUser) throw new Error("No user data found for the current account");
+        
+        return currentUser.documents[0]; // Assuming there's only one user document per account
+    } catch (error) {
+        console.error("Error fetching current user:", error);
+        throw error;
     }
 }
