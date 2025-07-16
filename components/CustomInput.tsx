@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+import cn from "clsx"
 
 interface CustomInputProps {
     placeholder?: string;
@@ -25,7 +26,7 @@ const CustomInput = ({placeholder="Enter text", value, onChangeText, label, secu
             onBlur={() => setIsFocused(false)}
             placeholder={placeholder}
             placeholderTextColor={"#888"}
-            /* className={cn("input", isFocused ? "border-secondary" : "border-myGray")} *//>
+            className={cn("input", isFocused ? "border-secondary" : "border-myGray")}/>
         </View>
     );
 }
