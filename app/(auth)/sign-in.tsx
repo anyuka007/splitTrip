@@ -20,9 +20,9 @@ const SignIn = () => {
             //console.log("Sign Up Success:", form);
             router.replace("/");
             
-        } catch (error) {
+        } catch (error: any) {
             console.error("Sign In Error:", error);
-            Alert.alert("Error", "Failed to sign in. Please try again.");
+            Alert.alert('Error', error.message);
             
         } finally {
             setIsSubmitting(false);
