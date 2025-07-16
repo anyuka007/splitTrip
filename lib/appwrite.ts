@@ -1,4 +1,5 @@
 import SignIn from '@/app/(auth)/sign-in';
+import { CreateUserParams, SignInParams } from '@/type';
 import { Account, Client, Databases, ID, Query } from 'react-native-appwrite';
 
 export const appwriteConfig = {
@@ -21,11 +22,6 @@ client
 export const account = new Account(client); // Use this only for development, not recommended for production
 export const databases = new Databases(client); // Use this only for development, not recommended for production
 
-interface CreateUserParams {
-    email: string;
-    password: string;
-    name: string;
-}
 
 export const createUser = async ({email, password, name }: CreateUserParams ) => {
     try {
@@ -51,10 +47,6 @@ export const createUser = async ({email, password, name }: CreateUserParams ) =>
         throw error;
     }
 
-}
-interface SignInParams {
-    email: string;
-    password: string;
 }
 
 export const signIn = async ({ email, password }: SignInParams) => {

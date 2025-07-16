@@ -35,3 +35,5 @@
 .input {
         @apply rounded-lg px-3 py-1 w-full text-base font-quicksand-semibold text-gray-500 border-b leading-5;
     }
+
+ 

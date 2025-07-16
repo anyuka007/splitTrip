@@ -20,7 +20,7 @@ export default function Index() {
   const { user } = useAuthStore();
   //console.log("CurrentUser: ", JSON.stringify(user, null, 2)); 
   return (
-    <SafeAreaView className="flex-1 bg-white mx-3">
+    <SafeAreaView className="flex-1  mx-3">
 
 <Fragment>
             <Text className="h1 text-center text-secondary">

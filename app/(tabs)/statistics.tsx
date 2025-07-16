@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 const Statistics = () => {
     return (
-        <View>
-            <Text>Statistics Screen</Text>
-            {/* Additional statistics content can go here */}
+        <View className='flex-1 justify-center items-center'>
+            <FontAwesome5 name="chart-bar" size={100} color="#9AC1F0" />
         </View>
     );
 }

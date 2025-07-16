@@ -1,7 +1,7 @@
 import { SplashScreen, Stack } from "expo-router";
 import "./global.css";
 import { useFonts } from "expo-font";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import useAuthStore from "@/store/auth.store";
 
 export default function RootLayout() {

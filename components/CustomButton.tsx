@@ -1,14 +1,6 @@
+import { CustomButtonProps } from '@/type';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-interface CustomButtonProps {
-    text: string;
-    onPress?: () => void;
-    classname?: string;
-    disabled?: boolean
-    isLoading?: boolean;
-}
-
 
 const CustomButton = ({ text = "Click Me", onPress, classname, disabled=false, isLoading=false }: CustomButtonProps) => {
 

@@ -1,10 +1,8 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {avatarColors} from '@/constants';
+import { AvatarProps } from '@/type';
 
-interface AvatarProps {
-  name: string; 
-}
 
 const Avatar = ({ name }: AvatarProps) => {
   const initials = name.split(" ").map((word:string) => word[0]).join("").toUpperCase().slice(0, 2);
