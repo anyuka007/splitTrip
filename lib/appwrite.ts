@@ -8,6 +8,10 @@ export const appwriteConfig = {
     projectId : process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID,
     databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
     userCollectionId: process.env.EXPO_PUBLIC_APPWRITE_USER_COLLECTION_ID,
+    tripsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_TRIPS_COLLECTION_ID,
+    participantsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_PARTICIPANTS_COLLECTION_ID,
+    expensesCollectionId: process.env.EXPO_PUBLIC_APPWRITE_EXPENSES_COLLECTION_ID,
+    expenseSharesCollectionId: process.env.EXPO_PUBLIC_APPWRITE_EXPENSE_SHARES_COLLECTION_ID,
 
 }
 
