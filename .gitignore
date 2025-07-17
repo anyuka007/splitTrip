@@ -40,5 +40,5 @@ yarn-error.*
 app-example
 
 
-# test files
-test.ts
+# test folder
+testDB

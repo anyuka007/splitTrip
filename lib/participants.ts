@@ -1,0 +1,2 @@
+import { appwriteConfig } from "./appwrite";
+
