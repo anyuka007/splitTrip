@@ -63,3 +63,32 @@ export const getUsersTrips = async (userId: string) => {
         throw error;
     }
 }
+
+export const getTrip = async (tripId: string) => {
+    try {
+        const trip = await databases.getDocument(
+            appwriteConfig.databaseId!,
+            appwriteConfig.tripsCollectionId!,
+            tripId
+        );
+        console.log("Trip details:", JSON.stringify(trip, null, 2));
+        return trip;
+    } catch (error) {
+        console.error("Error fetching trip by ID:", error);
+        throw error;
+    }
+}
+
+export const deleteTrip = async (tripId: string): Promise<void> => {
+    try {
+        await databases.deleteDocument(
+            appwriteConfig.databaseId!,
+            appwriteConfig.tripsCollectionId!,
+            tripId
+        );
+        console.log("Trip deleted successfully")
+    } catch (error) {
+        console.error("Error deleting trip:", error);
+        throw error;
+    }
+}
