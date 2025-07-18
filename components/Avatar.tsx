@@ -13,9 +13,9 @@ const Avatar = ({ name }: AvatarProps) => {
 
   return (
     <View
-      className="w-10 h-10 rounded-full items-center justify-center"
-      style={{ backgroundColor: randomColor }}>
-      <Text className="h3 font-bold text-white">{initials}</Text>
+      className="w-10 h-10 rounded-full items-center justify-center" style={{ borderWidth: 2, borderColor: randomColor }}
+      >
+      <Text className="h3 font-bold" style={{ color: randomColor }}>{initials}</Text>
     </View>
   )
 }

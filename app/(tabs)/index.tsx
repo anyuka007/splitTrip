@@ -63,7 +63,7 @@ export default function Index() {
                 <View className='flex flex-row items-center justify-between'>
                   <Text className='h3'>
                     Participants: </Text>
-                  <View className=' flex-row justify-end items-center h-12'>
+                  <View className=' flex-row justify-end items-center h-12 gap-0.5'>
                     {item.participants.map((participant, index) => (
                       <Avatar key={index} name={participant} />
                     ))}
