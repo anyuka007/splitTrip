@@ -1,18 +1,10 @@
 import { ID, Query } from "react-native-appwrite";
 import { appwriteConfig, databases, account, getCurrentUser } from "./appwrite";
 import useAuthStore from "@/store/auth.store";
+import { CreateTripParams, Trip } from "@/type";
 
 
-export interface CreateTripParams {
-    name: string;
-    dateStart?: string; // ISO date string
-    dateEnd: string;
-    defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
-    ownerId: string; 
-    }
-
-
-export const createTrip = async ({name, dateStart=new Date().toISOString(), dateEnd, defaultCurrency = "EUR",} : CreateTripParams) => {
+export const createTrip = async ({name, dateStart=new Date().toISOString(), dateEnd, defaultCurrency = "EUR",} : CreateTripParams): Promise<Trip> => {
     try {
         // get the current user
         const user = await getCurrentUser();
@@ -33,7 +25,7 @@ export const createTrip = async ({name, dateStart=new Date().toISOString(), date
             defaultCurrency,
             ownerId 
         };
-        const newTrip = await databases.createDocument(
+        const newTrip = await databases.createDocument<Trip>(
             appwriteConfig.databaseId!,
             appwriteConfig.tripsCollectionId!,
             ID.unique(),
@@ -49,9 +41,9 @@ export const createTrip = async ({name, dateStart=new Date().toISOString(), date
 }
 
 
-export const getUsersTrips = async (userId: string) => {
+export const getUsersTrips = async (userId: string): Promise<Trip[]> => {
     try {
-        const response = await databases.listDocuments(
+        const response = await databases.listDocuments<Trip>(
             appwriteConfig.databaseId!,
             appwriteConfig.tripsCollectionId!,
             [Query.equal("ownerId", userId)]
@@ -64,9 +56,9 @@ export const getUsersTrips = async (userId: string) => {
     }
 }
 
-export const getTrip = async (tripId: string) => {
+export const getTrip = async (tripId: string): Promise<Trip> => {
     try {
-        const trip = await databases.getDocument(
+        const trip = await databases.getDocument<Trip>(
             appwriteConfig.databaseId!,
             appwriteConfig.tripsCollectionId!,
             tripId

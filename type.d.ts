@@ -6,6 +6,14 @@ export interface User extends Models.Document {
     avatar: string;
 }
 
+export interface Trip extends Models.Document {
+    name: string;
+    dateStart: string; // ISO date string
+    dateEnd: string; // ISO date string
+    defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
+    ownerId: string; // User ID of the trip owner
+}
+
 export interface TabBarIconProps {
   name: string;
   title: string;
@@ -43,3 +51,12 @@ export interface SignInParams {
     email: string;
     password: string;
 }
+
+export interface CreateTripParams {
+    name: string;
+    dateStart?: string; // ISO date string
+    dateEnd: string;
+    defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
+    //ownerId: string; 
+    }
+
