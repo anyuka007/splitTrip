@@ -1,7 +1,6 @@
 import { ID, Query } from "react-native-appwrite";
-import { appwriteConfig, databases, account, getCurrentUser } from "./appwrite";
-import useAuthStore from "@/store/auth.store";
-import { CreateTripParams, Trip } from "@/type";
+import { appwriteConfig, databases, getCurrentUser } from "./appwrite";
+import { CreateTripData, CreateTripParams, Trip } from "@/type";
 
 
 export const createTrip = async ({name, dateStart=new Date().toISOString(), dateEnd, defaultCurrency = "EUR",} : CreateTripParams): Promise<Trip> => {
@@ -18,7 +17,7 @@ export const createTrip = async ({name, dateStart=new Date().toISOString(), date
         const startDate = new Date(dateStart).toISOString();
         const endDate = new Date(dateEnd).toISOString();
 
-        const tripData = {
+        const tripData: CreateTripData = {
             name,
             dateStart: startDate,
             dateEnd: endDate,

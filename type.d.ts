@@ -59,4 +59,10 @@ export interface CreateTripParams {
     defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
     //ownerId: string; 
     }
-
+export interface CreateTripData {
+    name: string;
+    dateStart: string;
+    dateEnd: string;
+    defaultCurrency: "EUR" | "USD" | "UAH" | "PLN";
+    ownerId: string;
+}
