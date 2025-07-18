@@ -1,18 +1,18 @@
-import { ID } from "react-native-appwrite";
+import { ID, Query } from "react-native-appwrite";
 import { appwriteConfig, databases, account, getCurrentUser } from "./appwrite";
 import useAuthStore from "@/store/auth.store";
 
 
 export interface CreateTripParams {
     name: string;
-    dateStart: string; // ISO date string
+    dateStart?: string; // ISO date string
     dateEnd: string;
     defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
     ownerId: string; 
     }
 
 
-export const createTrip = async ({name, dateStart, dateEnd, defaultCurrency = "EUR",} : CreateTripParams) => {
+export const createTrip = async ({name, dateStart=new Date().toISOString(), dateEnd, defaultCurrency = "EUR",} : CreateTripParams) => {
     try {
         // get the current user
         const user = await getCurrentUser();
@@ -48,3 +48,18 @@ export const createTrip = async ({name, dateStart, dateEnd, defaultCurrency = "E
     }
 }
 
+
+export const getUsersTrips = async (userId: string) => {
+    try {
+        const response = await databases.listDocuments(
+            appwriteConfig.databaseId!,
+            appwriteConfig.tripsCollectionId!,
+            [Query.equal("ownerId", userId)]
+        );
+        //console.log("User's trips:", JSON.stringify(response.documents, null, 2));
+        return response.documents;
+    } catch (error) {
+        console.error("Error fetching user's trips:", error);
+        throw error;
+    }
+}
