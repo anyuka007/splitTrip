@@ -4,7 +4,7 @@ import { CreateTripData, CreateTripParams, Trip } from "@/type";
 import { getDocument } from "@/utils/generics";
 
 
-export const createTrip = async ({name, dateStart=new Date().toISOString(), dateEnd, defaultCurrency = "EUR",} : CreateTripParams): Promise<Trip> => {
+export const createTrip = async ({ name, dateStart = new Date().toISOString(), dateEnd, defaultCurrency = "EUR", }: CreateTripParams): Promise<Trip> => {
     try {
         // get the current user
         const user = await getCurrentUser();
@@ -23,7 +23,7 @@ export const createTrip = async ({name, dateStart=new Date().toISOString(), date
             dateStart: startDate,
             dateEnd: endDate,
             defaultCurrency,
-            ownerId 
+            ownerId
         };
         const newTrip = await databases.createDocument<Trip>(
             appwriteConfig.databaseId!,
@@ -32,7 +32,7 @@ export const createTrip = async ({name, dateStart=new Date().toISOString(), date
             tripData
         );
         //console.log("New trip created:", JSON.stringify(newTrip, null, 2));
-    
+
         return newTrip;
     } catch (error) {
         console.error("Error creating trip:", error);
@@ -66,7 +66,7 @@ export const getTrip = async (tripId: string): Promise<Trip> => {
     return await getDocument<Expense>(expenseId, appwriteConfig.expensesCollectionId!);
 } */
 
- // without generic function 
+// without generic function 
 // export const getTrip = async (tripId: string): Promise<Trip> => {
 //     try {
 //         const trip = await databases.getDocument<Trip>(
@@ -100,19 +100,18 @@ export const deleteTrip = async (tripId: string): Promise<void> => {
 
 export const updateTrip = async (tripId: string, updateData: Partial<CreateTripParams>): Promise<Trip> => {
     try {
-    const trip = await getTrip(tripId);
-    const updatedTrip = { ...trip, ...updateData };
-    await databases.updateDocument(
-        appwriteConfig.databaseId!,
-        appwriteConfig.tripsCollectionId!,
-        tripId,
-        updatedTrip
-    );
-    return updatedTrip;
-        
+        const updatedTrip = await databases.updateDocument<Trip>(
+            appwriteConfig.databaseId!,
+            appwriteConfig.tripsCollectionId!,
+            tripId,
+            updateData
+        );
+        console.log("Trip updated successfully:", JSON.stringify(updatedTrip, null, 2));
+        return updatedTrip;
+
     } catch (error) {
         console.error("Error updating trip:", error);
         throw error;
     }
-    
+
 }
