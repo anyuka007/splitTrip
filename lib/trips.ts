@@ -1,7 +1,7 @@
 import { ID, Query } from "react-native-appwrite";
 import { appwriteConfig, databases, getCurrentUser } from "./appwrite";
 import { CreateTripData, CreateTripParams, Trip } from "@/type";
-import { getDocument } from "@/utils/generics";
+import { deleteDocument, getDocument } from "@/utils/generics";
 
 
 export const createTrip = async ({ name, dateStart = new Date().toISOString(), dateEnd, defaultCurrency = "EUR", }: CreateTripParams): Promise<Trip> => {
@@ -60,43 +60,16 @@ export const getUsersTrips = async (userId: string): Promise<Trip[]> => {
 export const getTrip = async (tripId: string): Promise<Trip> => {
     return await getDocument<Trip>(tripId, appwriteConfig.tripsCollectionId!);
 }
+export const deleteTrip = async (tripId: string): Promise<void> => {
+    return await deleteDocument(tripId, appwriteConfig.tripsCollectionId!);
+}
+
+
 
 
 /* export const getExpenses = async (expenseId: string): Promise<Expense> => {
     return await getDocument<Expense>(expenseId, appwriteConfig.expensesCollectionId!);
 } */
-
-// without generic function 
-// export const getTrip = async (tripId: string): Promise<Trip> => {
-//     try {
-//         const trip = await databases.getDocument<Trip>(
-//             appwriteConfig.databaseId!,
-//             appwriteConfig.tripsCollectionId!,
-//             tripId
-//         );
-//         console.log("Trip details:", JSON.stringify(trip, null, 2));
-//         return trip;
-//     } catch (error) {
-//         console.error("Error fetching trip by ID:", error);
-//         throw error;
-//     }
-// }
-
-export const deleteTrip = async (tripId: string): Promise<void> => {
-    try {
-        await databases.deleteDocument(
-            appwriteConfig.databaseId!,
-            appwriteConfig.tripsCollectionId!,
-            tripId
-        );
-        console.log("Trip deleted successfully")
-    } catch (error) {
-        console.error("Error deleting trip:", error);
-        throw error;
-    }
-}
-
-
 
 export const updateTrip = async (tripId: string, updateData: Partial<CreateTripParams>): Promise<Trip> => {
     try {
