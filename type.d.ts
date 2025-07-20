@@ -10,7 +10,7 @@ export interface Trip extends Models.Document {
     name: string;
     dateStart: string; // ISO date string
     dateEnd: string; // ISO date string
-    defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
+    defaultCurrency: "EUR" | "USD" | "UAH" | "PLN";
     ownerId: string; // User ID of the trip owner
 }
 

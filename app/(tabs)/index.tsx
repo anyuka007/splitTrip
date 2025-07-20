@@ -1,5 +1,6 @@
 import Avatar from '@/components/Avatar';
 import CustomButton from '@/components/CustomButton';
+import TripCard from '@/components/TripCard';
 import { getTripParticipants } from '@/lib/participants';
 import { getUsersTrips } from '@/lib/trips';
 import useAuthStore from '@/store/auth.store';
@@ -12,7 +13,7 @@ import { Alert, FlatList, Pressable, SafeAreaView, Text, View } from "react-nati
 
 export default function Index() {
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [allParticipants, setAllParticipants] = useState<{ [tripId: string]: Participant[] }>({});
+  //const [allParticipants, setAllParticipants] = useState<{ [tripId: string]: Participant[] }>({});
   const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
 
@@ -29,22 +30,12 @@ export default function Index() {
       //console.log("Fetched user's trips:", userTrips);
       setTrips(userTrips);
 
-      // load participants for each trip in format {tripId: Participant[]}
-      const participantsData: { [tripId: string]: Participant[] } = {};
-      for (const trip of userTrips) {
-        try {
-          const participants = await getTripParticipants(trip.$id);
-          participantsData[trip.$id] = participants;
-        } catch (error) {
-          console.error(`Error loading participants for trip ${trip.$id}:`, error);
-          participantsData[trip.$id] = []; // Fallback to empty array
-        }
-      }
-      //console.log("participantData", JSON.stringify(participantsData, null, 2));
-      setAllParticipants(participantsData);
+      const tripsIds = userTrips.map(trip => trip.$id);
+      console.log("Trips IDs:", tripsIds);
 
-      //console.log("Fetched trips with participants:", userTrips, participantsData);
-    } catch (error) {
+      
+
+      } catch (error) {
       console.error("Error fetching user's trips:", error);
       Alert.alert("Error", "Failed to fetch trips");
     } finally {
@@ -57,7 +48,7 @@ export default function Index() {
     if (user) {
       fetchTrips();
     }
-  }, [user]); // Reloads when user changes
+  }, [user]); 
 
   // Reload trips when the screen is focused
   useFocusEffect(
@@ -68,15 +59,7 @@ export default function Index() {
     }, [user])
   );
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
+  
   return (
     <SafeAreaView className="flex-1 mx-3">
       <Fragment>
@@ -100,55 +83,8 @@ export default function Index() {
         <FlatList
           data={trips}
           renderItem={({ item }) => {
-            const participants = allParticipants[item.$id] || []; // Fallback to empty array if no participants found
-
-            return (
-              <View>
-                <Pressable
-                  className='bg-white rounded-xl flex justify-between p-3 mb-3'
-                  style={{
-                    shadowColor: '#000',
-                    shadowOffset: {
-                      width: 0,
-                      height: 2,
-                    },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 8,
-                    elevation: 5,
-                  }}
-                >
-                  <View>
-                    <Text className="h2">
-                      {item.name}
-                    </Text>
-                    <Text className="text-regular text-xs">
-                      {`${formatDate(item.dateStart)} - ${formatDate(item.dateEnd)}`}
-                    </Text>
-                    <Text className="text-regular text-xs text-myGray mt-1">
-                      Currency: {item.defaultCurrency}
-                    </Text>
-                  </View>
-
-                  <View className='flex flex-row items-center justify-between mt-2'>
-                    <Text className='h3'>Participants:</Text>
-                    <View className='flex-row justify-end items-center h-12 gap-0.5'>
-                      {participants.length > 0 ? (
-                        participants.slice(0, 3).map((participant, index) => (
-                          <Avatar key={participant.$id} name={participant.name} />
-                        ))
-                      ) : (
-                        <Text className="text-xs text-myGray">No participants</Text>
-                      )}
-                      {participants.length > 3 && (
-                        <View className="bg-myGray rounded-full w-8 h-8 justify-center items-center ml-1">
-                          <Text className="text-white text-xs">+{participants.length - 3}</Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                </Pressable>
-              </View>
-            )
+            //console.log("Rendering trip:", item);
+            return <TripCard trip={item} />;
           }}
           keyExtractor={(item) => item.$id}
           contentContainerStyle={{ paddingBottom: 30 }}
