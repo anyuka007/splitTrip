@@ -14,6 +14,11 @@ export interface Trip extends Models.Document {
     ownerId: string; // User ID of the trip owner
 }
 
+export interface Participant extends Models.Document {
+    name: string;
+    tripId: string; // ID of the trip this participant belongs to
+}
+
 export interface TabBarIconProps {
   name: string;
   title: string;
@@ -65,4 +70,14 @@ export interface CreateTripData {
     dateEnd: string;
     defaultCurrency: "EUR" | "USD" | "UAH" | "PLN";
     ownerId: string;
+}
+
+export interface CreateParticipantParams {
+    name: string;
+    tripId: string; // ID of the trip this participant belongs to
+}
+
+export interface CreateParticipantData {
+    name: string;
+    tripId: string; 
 }
