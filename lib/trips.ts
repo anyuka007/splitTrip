@@ -1,7 +1,8 @@
 import { ID, Query } from "react-native-appwrite";
 import { appwriteConfig, databases, getCurrentUser } from "./appwrite";
-import { CreateTripData, CreateTripParams, Trip } from "@/type";
+import { CreateTripData, CreateTripParams, Participant, Trip } from "@/type";
 import { deleteDocument, getDocument } from "@/utils/generics";
+import { getParticipantsByTripIds } from "./participants";
 
 
 export const createTrip = async ({ name, dateStart = new Date().toISOString(), dateEnd, defaultCurrency = "EUR", }: CreateTripParams): Promise<Trip> => {
@@ -46,7 +47,7 @@ export const getUsersTrips = async (userId: string): Promise<Trip[]> => {
         const response = await databases.listDocuments<Trip>(
             appwriteConfig.databaseId!,
             appwriteConfig.tripsCollectionId!,
-            [Query.equal("ownerId", userId)]
+            [Query.select(["*"]), Query.equal("ownerId", userId)]
         );
         //console.log("User's trips:", JSON.stringify(response.documents, null, 2));
         return response.documents;
@@ -55,7 +56,34 @@ export const getUsersTrips = async (userId: string): Promise<Trip[]> => {
         throw error;
     }
 }
+export interface TripWithParticipants extends Trip {
+    participants: Participant[];
+}
 
+export const getTripsWithParticipants = async (userId: string): Promise<TripWithParticipants[]> => {
+    try {
+        const trips = await getUsersTrips(userId);
+
+        const tripsIds = trips.map(trip => trip.$id);
+        // Fetch participants for the trips
+        const participants = await getParticipantsByTripIds(tripsIds);
+        //console.log("aaaaa Fetched participants:", JSON.stringify(participants, null, 2));
+
+        // Map trips to include participants
+        const tripsWithParticipants: TripWithParticipants[] = trips.map(trip => {
+            const tripParticipants = participants.filter(participant => participant.tripId === trip.$id);
+            return {
+                ...trip,
+                participants: tripParticipants
+            };
+        });
+        //console.log("Trips with participants:", JSON.stringify(tripsWithParticipants, null, 2));
+        return tripsWithParticipants;
+    } catch (error) {
+        console.error("Error fetching trips with participants:", error);
+        throw error;
+    }
+}
 
 export const getTrip = async (tripId: string): Promise<Trip> => {
     return await getDocument<Trip>(tripId, appwriteConfig.tripsCollectionId!);
@@ -63,9 +91,6 @@ export const getTrip = async (tripId: string): Promise<Trip> => {
 export const deleteTrip = async (tripId: string): Promise<void> => {
     return await deleteDocument(tripId, appwriteConfig.tripsCollectionId!);
 }
-
-
-
 
 /* export const getExpenses = async (expenseId: string): Promise<Expense> => {
     return await getDocument<Expense>(expenseId, appwriteConfig.expensesCollectionId!);

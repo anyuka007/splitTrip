@@ -1,10 +1,7 @@
-import Avatar from '@/components/Avatar';
 import CustomButton from '@/components/CustomButton';
 import TripCard from '@/components/TripCard';
-import { getTripParticipants } from '@/lib/participants';
-import { getUsersTrips } from '@/lib/trips';
+import { getTripsWithParticipants, TripWithParticipants } from '@/lib/trips';
 import useAuthStore from '@/store/auth.store';
-import { Participant, Trip } from '@/type';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from 'expo-router';
 import { Fragment, useCallback, useEffect, useState } from 'react';
@@ -12,8 +9,7 @@ import { Alert, FlatList, Pressable, SafeAreaView, Text, View } from "react-nati
 
 
 export default function Index() {
-  const [trips, setTrips] = useState<Trip[]>([]);
-  //const [allParticipants, setAllParticipants] = useState<{ [tripId: string]: Participant[] }>({});
+  const [trips, setTrips] = useState<TripWithParticipants[]>([]);
   const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
 
@@ -26,15 +22,11 @@ export default function Index() {
       }
 
       // load user's trips
-      const userTrips = await getUsersTrips(user.$id);
+      const userTrips = await getTripsWithParticipants(user.$id);
       //console.log("Fetched user's trips:", userTrips);
       setTrips(userTrips);
 
-      const tripsIds = userTrips.map(trip => trip.$id);
-      console.log("Trips IDs:", tripsIds);
-
       
-
       } catch (error) {
       console.error("Error fetching user's trips:", error);
       Alert.alert("Error", "Failed to fetch trips");

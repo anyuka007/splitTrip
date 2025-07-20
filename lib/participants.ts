@@ -23,17 +23,17 @@ export const createParticipant = async ({ name, tripId }: CreateParticipantParam
     }
 }
 
-export const getTripParticipants = async (tripId: string): Promise<Participant[]> => {
+export const getParticipantsByTripIds = async (tripIds: string[]): Promise<Participant[]> => {
     try {
         const response = await databases.listDocuments<Participant>(
             appwriteConfig.databaseId!,
             appwriteConfig.participantsCollectionId!,
-            [Query.equal("tripId", tripId)]
+            [Query.select(["*"]), Query.equal("tripId", tripIds)]
         );
-        //console.log("Participants for trip:", JSON.stringify(response.documents, null, 2));
+        //console.log("bbbbb Participants for trips:", JSON.stringify(response.documents, null, 2));
         return response.documents;
     } catch (error) {
-        console.error("Error fetching participants by trip ID:", error);
+        console.error("Error fetching participants by trip IDs:", error);
         throw error;
     }
 }
