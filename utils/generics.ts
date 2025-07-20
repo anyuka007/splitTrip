@@ -12,7 +12,7 @@ export const getDocument = async<T extends Models.Document>(id: string, collecti
             collectionId,
             id
         );
-        console.log("Document details:", JSON.stringify(document, null, 2));
+        //console.log("Document details:", JSON.stringify(document, null, 2));
         return document;
     } catch (error) {
         console.error("Error fetching document by ID:", error);

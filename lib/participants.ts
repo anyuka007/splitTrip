@@ -1,7 +1,7 @@
-import { ID, Query } from "react-native-appwrite";
-import { appwriteConfig, databases } from "./appwrite";
 import { CreateParticipantData, CreateParticipantParams, Participant } from "@/type";
 import { deleteDocument, getDocument } from "@/utils/generics";
+import { ID, Query } from "react-native-appwrite";
+import { appwriteConfig, databases } from "./appwrite";
 
 export const createParticipant = async ({ name, tripId }: CreateParticipantParams): Promise<Participant> => {
     try {
@@ -15,7 +15,7 @@ export const createParticipant = async ({ name, tripId }: CreateParticipantParam
             ID.unique(),
             participantData
         );
-        console.log("New participant created:", JSON.stringify(newParticipant, null, 2));
+        //console.log("New participant created:", JSON.stringify(newParticipant, null, 2));
         return newParticipant;
     } catch (error) {
         console.error("Error creating participant:", error);
@@ -23,14 +23,14 @@ export const createParticipant = async ({ name, tripId }: CreateParticipantParam
     }
 }
 
-export const getParticipantsByTripId = async (tripId: string): Promise<Participant[]> => {
+export const getTripParticipants = async (tripId: string): Promise<Participant[]> => {
     try {
         const response = await databases.listDocuments<Participant>(
             appwriteConfig.databaseId!,
             appwriteConfig.participantsCollectionId!,
             [Query.equal("tripId", tripId)]
         );
-        console.log("Participants for trip:", JSON.stringify(response.documents, null, 2));
+        //console.log("Participants for trip:", JSON.stringify(response.documents, null, 2));
         return response.documents;
     } catch (error) {
         console.error("Error fetching participants by trip ID:", error);
@@ -55,7 +55,7 @@ export const updateParticipant = async (participantId: string, newName: string):
             participantId,
             { name: newName }
         );
-        console.log("Participant updated successfully:", JSON.stringify(updatedParticipant, null, 2));
+        //console.log("Participant updated successfully:", JSON.stringify(updatedParticipant, null, 2));
         return updatedParticipant;
 
     } catch (error) {

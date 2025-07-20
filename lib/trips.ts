@@ -79,7 +79,7 @@ export const updateTrip = async (tripId: string, updateData: Partial<CreateTripP
             tripId,
             updateData
         );
-        console.log("Trip updated successfully:", JSON.stringify(updatedTrip, null, 2));
+        //console.log("Trip updated successfully:", JSON.stringify(updatedTrip, null, 2));
         return updatedTrip;
 
     } catch (error) {

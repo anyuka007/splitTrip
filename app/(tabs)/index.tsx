@@ -1,90 +1,170 @@
-import CustomButton from '@/components/CustomButton';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { FlatList, Pressable, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
-import { Fragment } from 'react';
 import Avatar from '@/components/Avatar';
+import CustomButton from '@/components/CustomButton';
+import { getTripParticipants } from '@/lib/participants';
+import { getUsersTrips } from '@/lib/trips';
 import useAuthStore from '@/store/auth.store';
-
-const trips = [
-  { id: "1", title: "Trip to Paris", startDate: "2023-10-01", endDate: "2023-10-10", participants: ["Alice Braun", "Bob"] },
-  { id: "2", title: "Beach Vacation", startDate: "2023-11-05", endDate: "2023-11-12", participants: ["Charlie", "Alice backgroundColor"] },
-  { id: "3", title: "Mountain Hiking", startDate: "2023-12-15", endDate: "2023-12-20", participants: ["Eve Lucky", "Frank", "Alice Braun"] },
-  { id: "4", title: "City Exploration", startDate: "2024-01-10", endDate: "2024-01-15", participants: ["Bob", "Charlie"] },
-  { id: "5", title: "Cultural Festival", startDate: "2024-02-20", endDate: "2024-02-25", participants: ["Alice Braun", "Eve Lucky"] },
-  { id: "6", title: "Adventure Trip", startDate: "2024-03-05", endDate: "2024-03-10", participants: ["Frank", "Charlie", "Eve Lucky"] },
-  { id: "7", title: "Relaxing Retreat", startDate: "2024-04-01", endDate: "2024-04-07", participants: ["Alice Braun", "Bob", "Frank Marly Sonne"] },
-];
+import { Participant, Trip } from '@/type';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFocusEffect } from 'expo-router';
+import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Alert, FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
 
 
 export default function Index() {
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [tripParticipants, setTripParticipants] = useState<{ [tripId: string]: Participant[] }>({});
+  const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
-  //console.log("CurrentUser: ", JSON.stringify(user, null, 2)); 
+
+  const fetchTrips = async () => {
+    try {
+      setLoading(true);
+      if (!user) {
+        Alert.alert("Error", "No user logged in");
+        return;
+      }
+
+      // load user's trips
+      const userTrips = await getUsersTrips(user.$id);
+      setTrips(userTrips);
+
+      // load participants for each trip
+      const participantsData: { [tripId: string]: Participant[] } = {};
+      for (const trip of userTrips) {
+        try {
+          const participants = await getTripParticipants(trip.$id);
+          participantsData[trip.$id] = participants;
+        } catch (error) {
+          console.error(`Error loading participants for trip ${trip.$id}:`, error);
+          participantsData[trip.$id] = []; // Fallback to empty array
+        }
+      }
+      setTripParticipants(participantsData);
+
+      //console.log("Fetched trips with participants:", userTrips, participantsData);
+    } catch (error) {
+      console.error("Error fetching user's trips:", error);
+      Alert.alert("Error", "Failed to fetch trips");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch trips when the component mounts or when user changes
+  useEffect(() => {
+    if (user) {
+      fetchTrips();
+    }
+  }, [user]); // Reloads when user changes
+
+  // Reload trips when the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        fetchTrips();
+      }
+    }, [user])
+  );
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
   return (
-    <SafeAreaView className="flex-1  mx-3">
+    <SafeAreaView className="flex-1 mx-3">
+      <Fragment>
+        <Text className="h1 text-center text-secondary">
+          Your Trips
+        </Text>
+        <View className="flex flex-row items-center justify-between my-3">
+          <Text className='h3'>{`You have ${trips.length} trips`}</Text>
+          <Pressable className="bg-tertiary rounded-full p-2" onPress={() => alert('Logout')}>
+            <Ionicons name="exit-outline" size={24} color="white" />
+          </Pressable>
+        </View>
+        <CustomButton text="Add New Trip" onPress={() => alert('Add New Trip')} />
+      </Fragment>
 
-<Fragment>
-            <Text className="h1 text-center text-secondary">
-              Your Trips
-            </Text>
-            <View className="flex flex-row items-center justify-between my-3">
-              <Text className='h3'>{`You have ${trips.length} trips`}</Text>
-              <Pressable className="bg-tertiary rounded-full p-2" onPress={() => alert('Logout')}>
-                <Ionicons name="exit-outline" size={24} color="white" />
-              </Pressable>
-            </View>
-            <CustomButton text="Add New Trip" onPress={() => alert('Add New Trip')} />
-          </Fragment>
+      {loading ? (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-regular">Loading trips...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={trips}
+          renderItem={({ item }) => {
+            const participants = tripParticipants[item.$id] || []; // Fallback to empty array if no participants found
 
-      <FlatList
-        data={trips}
-        renderItem={({ item }) => {
-          return (
-            <View>
-              <Pressable className='bg-white rounded-xl flex justify-between p-3 mb-3'
-                style={{
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 8,
-                  elevation: 5, // für Android
-                }}>
-                <View>
-                  <Text className="h2">
-                    {item.title}
-                  </Text>
-                  <Text className="text-regular text-xs">
-                    {`${item.startDate} - ${item.endDate}`}
-                  </Text>
-                </View>
-
-                <View className='flex flex-row items-center justify-between'>
-                  <Text className='h3'>
-                    Participants: </Text>
-                  <View className=' flex-row justify-end items-center h-12 gap-0.5'>
-                    {item.participants.map((participant, index) => (
-                      <Avatar key={index} name={participant} />
-                    ))}
+            return (
+              <View>
+                <Pressable
+                  className='bg-white rounded-xl flex justify-between p-3 mb-3'
+                  style={{
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 8,
+                    elevation: 5,
+                  }}
+                >
+                  <View>
+                    <Text className="h2">
+                      {item.name}
+                    </Text>
+                    <Text className="text-regular text-xs">
+                      {`${formatDate(item.dateStart)} - ${formatDate(item.dateEnd)}`}
+                    </Text>
+                    <Text className="text-regular text-xs text-myGray mt-1">
+                      Currency: {item.defaultCurrency}
+                    </Text>
                   </View>
-                </View>
-              </Pressable>
+
+                  <View className='flex flex-row items-center justify-between mt-2'>
+                    <Text className='h3'>Participants:</Text>
+                    <View className='flex-row justify-end items-center h-12 gap-0.5'>
+                      {participants.length > 0 ? (
+                        participants.slice(0, 3).map((participant, index) => (
+                          <Avatar key={participant.$id} name={participant.name} />
+                        ))
+                      ) : (
+                        <Text className="text-xs text-myGray">No participants</Text>
+                      )}
+                      {participants.length > 3 && (
+                        <View className="bg-myGray rounded-full w-8 h-8 justify-center items-center ml-1">
+                          <Text className="text-white text-xs">+{participants.length - 3}</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                </Pressable>
+              </View>
+            )
+          }}
+          keyExtractor={(item) => item.$id}
+          contentContainerStyle={{ paddingBottom: 30 }}
+
+          ListEmptyComponent={() => (
+            <View className="flex justify-center items-center mt-10">
+              <Text className="text-regular text-myGray">No trips found</Text>
+              <Text className="text-xs text-myGray mt-2">Create your first trip!</Text>
             </View>
-          )
-        }
-        }
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={{ paddingBottom: 30 }}
-        
+          )}
 
-        ListFooterComponent={() => (
-          <View className="flex justify-center items-center mt-5">
-            <Text className="text-regular text-xs text-myGray ">Developed with ❤️ by Anna Popova</Text>
-          </View>
-        )}
-      />
-
+          ListFooterComponent={() => (
+            <View className="flex justify-center items-center mt-5">
+              <Text className="text-regular text-xs text-myGray">Developed with ❤️ by Anna Popova</Text>
+            </View>
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
