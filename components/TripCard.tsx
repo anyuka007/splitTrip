@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Avatar from './Avatar';
 import { formatDate } from '@/utils/helpers';
 import { TripWithParticipants } from '@/lib/trips';
+import { router } from 'expo-router';
 
 export interface TripCardParams {
     trip: TripWithParticipants;
@@ -24,6 +25,7 @@ const TripCard = ({ trip }: TripCardParams) => {
                     shadowRadius: 8,
                     elevation: 5,
                 }}
+                onPress={() => router.push(`/(pages)/trip/${trip.$id}`)}
             >
                 <View>
                     <Text className="h2">

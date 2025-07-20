@@ -3,7 +3,7 @@ import TripCard from '@/components/TripCard';
 import { getTripsWithParticipants, TripWithParticipants } from '@/lib/trips';
 import useAuthStore from '@/store/auth.store';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
 
@@ -64,7 +64,7 @@ export default function Index() {
             <Ionicons name="exit-outline" size={24} color="white" />
           </Pressable>
         </View>
-        <CustomButton text="Add New Trip" onPress={() => alert('Add New Trip')} />
+        <CustomButton text="Add New Trip" onPress={() => router.push('/(pages)/trip/create')} />
       </Fragment>
 
       {loading ? (
