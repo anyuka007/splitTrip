@@ -12,7 +12,7 @@ import { Alert, FlatList, Pressable, SafeAreaView, Text, View } from "react-nati
 
 export default function Index() {
   const [trips, setTrips] = useState<Trip[]>([]);
-  const [tripParticipants, setTripParticipants] = useState<{ [tripId: string]: Participant[] }>({});
+  const [allParticipants, setAllParticipants] = useState<{ [tripId: string]: Participant[] }>({});
   const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
 
@@ -26,9 +26,10 @@ export default function Index() {
 
       // load user's trips
       const userTrips = await getUsersTrips(user.$id);
+      //console.log("Fetched user's trips:", userTrips);
       setTrips(userTrips);
 
-      // load participants for each trip
+      // load participants for each trip in format {tripId: Participant[]}
       const participantsData: { [tripId: string]: Participant[] } = {};
       for (const trip of userTrips) {
         try {
@@ -39,7 +40,8 @@ export default function Index() {
           participantsData[trip.$id] = []; // Fallback to empty array
         }
       }
-      setTripParticipants(participantsData);
+      //console.log("participantData", JSON.stringify(participantsData, null, 2));
+      setAllParticipants(participantsData);
 
       //console.log("Fetched trips with participants:", userTrips, participantsData);
     } catch (error) {
@@ -98,7 +100,7 @@ export default function Index() {
         <FlatList
           data={trips}
           renderItem={({ item }) => {
-            const participants = tripParticipants[item.$id] || []; // Fallback to empty array if no participants found
+            const participants = allParticipants[item.$id] || []; // Fallback to empty array if no participants found
 
             return (
               <View>
