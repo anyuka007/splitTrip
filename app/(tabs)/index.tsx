@@ -1,55 +1,36 @@
 import CustomButton from '@/components/CustomButton';
 import TripCard from '@/components/TripCard';
-import { getTripsWithParticipants, TripWithParticipants } from '@/lib/trips';
 import useAuthStore from '@/store/auth.store';
+import useTripsStore from '@/store/trips.store';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useFocusEffect } from 'expo-router';
-import { Fragment, useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
+import { Fragment, useEffect, useState } from 'react';
+import { FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
 
 
 export default function Index() {
-  const [trips, setTrips] = useState<TripWithParticipants[]>([]);
   const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
+  const { trips, fetchTrips } = useTripsStore();
+  //console.log("Trips from store:", JSON.stringify(trips, null, 2));
 
-  const fetchTrips = async () => {
-    try {
-      setLoading(true);
-      if (!user) {
-        Alert.alert("Error", "No user logged in");
-        return;
-      }
-
-      // load user's trips
-      const userTrips = await getTripsWithParticipants(user.$id);
-      //console.log("Fetched user's trips:", userTrips);
-      setTrips(userTrips);
-
-      
-      } catch (error) {
-      console.error("Error fetching user's trips:", error);
-      Alert.alert("Error", "Failed to fetch trips");
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   // Fetch trips when the component mounts or when user changes
   useEffect(() => {
     if (user) {
-      fetchTrips();
+      fetchTrips(user.$id);
     }
   }, [user]); 
 
   // Reload trips when the screen is focused
-  useFocusEffect(
+  /* useFocusEffect(
     useCallback(() => {
       if (user) {
-        fetchTrips();
+        fetchTrips(user.$id);
       }
     }, [user])
-  );
+  );  */
 
   
   return (

@@ -14,6 +14,11 @@ export interface Trip extends Models.Document {
     ownerId: string; // User ID of the trip owner
 }
 
+export interface TripWithParticipants extends Trip {
+    participants: Participant[];
+}
+
+
 export interface Participant extends Models.Document {
     name: string;
     tripId: string; // ID of the trip this participant belongs to

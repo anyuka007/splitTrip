@@ -2,8 +2,8 @@ import { Pressable, Text } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import Avatar from './Avatar';
 import { formatDate } from '@/utils/helpers';
-import { TripWithParticipants } from '@/lib/trips';
 import { router } from 'expo-router';
+import { TripWithParticipants } from '@/type';
 
 export interface TripCardParams {
     trip: TripWithParticipants;

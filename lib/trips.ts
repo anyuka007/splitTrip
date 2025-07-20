@@ -1,6 +1,6 @@
 import { ID, Query } from "react-native-appwrite";
 import { appwriteConfig, databases, getCurrentUser } from "./appwrite";
-import { CreateTripData, CreateTripParams, Participant, Trip } from "@/type";
+import { CreateTripData, CreateTripParams, Participant, Trip, TripWithParticipants } from "@/type";
 import { deleteDocument, getDocument } from "@/utils/generics";
 import { getParticipantsByTripIds } from "./participants";
 
@@ -55,9 +55,6 @@ export const getUsersTrips = async (userId: string): Promise<Trip[]> => {
         console.error("Error fetching user's trips:", error);
         throw error;
     }
-}
-export interface TripWithParticipants extends Trip {
-    participants: Participant[];
 }
 
 export const getTripsWithParticipants = async (userId: string): Promise<TripWithParticipants[]> => {
