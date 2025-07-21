@@ -6,6 +6,8 @@ import { Pressable, Text, TextInput, View, Alert } from 'react-native';
 import { formatDate } from '@/utils/helpers';
 import { UpdateTripData } from '@/type';
 import { updateTrip } from '@/lib/trips';
+import CustomButton from '@/components/CustomButton';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 const TripDetails = () => {
     const { id } = useLocalSearchParams();
@@ -74,7 +76,6 @@ const TripDetails = () => {
         if (trip && updateTripData.name.trim() !== trip.name) {
             try {
                 await editTrip(tripId!, { name: updateTripData.name.trim() });
-                Alert.alert("Success", "Trip name updated!");
             } catch (error) {
                 console.error("Error updating trip:", error);
                 Alert.alert("Error", "Failed to update trip");
@@ -86,7 +87,7 @@ const TripDetails = () => {
         setEditingField(false);
     };
 
-    // ✅ Cancel function (revert changes)
+    // Cancel function (revert changes)
     const handleCancel = () => {
         if (trip) {
             setUpdateTripData(prev => ({ ...prev, name: trip.name }));
@@ -106,51 +107,57 @@ const TripDetails = () => {
     }
 
     return (
-        <View className="flex h-full items-center justify-center">
+        <View className="flex h-full items-center  px-4">
+            <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full '>
             <Pressable onPress={handleDoubleTap} className="mb-4">
                 {isEditingField ? (
                     <View className="items-center">
                         <TextInput
-                            className="h1 text-center border border-primary rounded-lg p-2 min-w-[200px]"
+                            className="h1 text-center border-b-1 border-primary rounded-lg p-2 min-w-[200px]"
                             value={updateTripData.name || ''}
                             onChangeText={(text) => {
                                 setUpdateTripData({ ...updateTripData, name: text });
                             }}
                             autoFocus
-                            onSubmitEditing={handleAutoSave} // ✅ Save on Enter
-                            onBlur={handleAutoSave} // ✅ Save when losing focus
+                            onSubmitEditing={handleAutoSave} //  Save on Enter
+                            onBlur={handleAutoSave} // Save when losing focus
                             returnKeyType="done"
                             placeholder="Enter trip name"
                         />
-                        {/* ✅ Simple hint - no buttons needed */}
-                        <Text className="text-xs text-gray-400 mt-2">
-                            Press Enter or tap outside to save
-                        </Text>
                     </View>
                 ) : (
                     <View className="items-center">
                         <Text className="h1 text-center">{trip.name}</Text>
-                        <Text className="text-xs text-gray-400 mt-1">
-                            Double-tap to edit
-                        </Text>
                     </View>
                 )}
             </Pressable>
-
-            <Text className="text-regular text-xs">
+            <Pressable className="bg-tertiary rounded-full p-2" onPress={() => alert('Update')}>
+                        <FontAwesome5 name="edit" size={24} color="white" />
+                      </Pressable>
+            <Text className="text-regular text-center">
                 {`${formatDate(trip.dateStart)} - ${formatDate(trip.dateEnd)}`}
             </Text>
-            <Text className="text-regular text-xs text-myGray mt-1">
-                Currency: {trip.defaultCurrency}
-            </Text>
+            <View className='flex flex-row justify-between'>
+                <Text>Currency:</Text>
+                <Text>{trip.defaultCurrency}</Text>
+            </View>
             <View className='flex flex-row justify-between'>
                 <Text>Participants: </Text>
                 <View className='flex flex-row gap-2'>
-                    {trip?.participants.map((participant) => (
-                        <Text key={participant.$id}>{participant.name}</Text>
-                    ))}
+                    <Text>{trip?.participants.map(participant => participant.name).join(', ')}</Text>
                 </View>
             </View>
+        </View>
+        <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full '>
+            <Text>Balance</Text>
+        </View>
+        <View className='flex  pb-4 mb-4 w-full '>
+             <Text className='h2'>Expenses</Text>
+            <CustomButton text='Add Expense' onPress={() => {Alert.alert('Add Expense Pressed');}} />
+            <Text>Expense 1</Text>
+            <Text>Expense 2</Text>
+            <Text>Expense 3</Text>
+        </View>
         </View>
     );
 }

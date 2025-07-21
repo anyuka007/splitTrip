@@ -41,7 +41,7 @@ const useTripsStore = create<TripsState>((set, get) => ({
       set({ loading: true, error: null });
 
       const editedTrip = await updateTrip(tripId, updateData);
-      console.log("Trip updated successfully:", JSON.stringify(editedTrip, null, 2));
+      //console.log("Trip updated successfully:", JSON.stringify(editedTrip, null, 2));
 
       // Update Store - merge old trip with new data
       set((state) => ({
