@@ -25,7 +25,7 @@ const TripCard = ({ trip }: TripCardParams) => {
                     shadowRadius: 8,
                     elevation: 5,
                 }}
-                onPress={() => router.push(`/(pages)/trip/${trip.$id}`)}
+                onPress={() => router.push(`/trip/${trip.$id}`)}
             >
                 <View>
                     <Text className="h2">

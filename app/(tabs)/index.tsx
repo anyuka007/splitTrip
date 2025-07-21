@@ -45,7 +45,7 @@ export default function Index() {
             <Ionicons name="exit-outline" size={24} color="white" />
           </Pressable>
         </View>
-        <CustomButton text="Add New Trip" onPress={() => router.push('/(pages)/trip/create')} />
+        <CustomButton text="Add New Trip" onPress={() => router.push('/trip/create')} />
       </Fragment>
 
       {loading ? (

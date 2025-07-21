@@ -77,6 +77,22 @@ export interface CreateTripData {
     ownerId: string;
 }
 
+export interface UpdateTripParams {
+    id: string;
+    name?: string;
+    dateStart?: string; // ISO date string
+    dateEnd?: string; // ISO date string
+    defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
+}
+
+export interface UpdateTripData {
+    name?: string;
+    dateStart?: string; // ISO date string
+    dateEnd?: string; // ISO date string
+    defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
+}
+
+
 export interface CreateParticipantParams {
     name: string;
     tripId: string; // ID of the trip this participant belongs to

@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import useAuthStore from "@/store/auth.store";
 
 export default function RootLayout() {
-  const {isLoading, fetchAuthenticatedUser} = useAuthStore();
+  const { isLoading, fetchAuthenticatedUser } = useAuthStore();
 
   const [fontsLoaded, error] = useFonts({
     "Quicksand-Bold": require("../assets/fonts/Quicksand-Bold.ttf"),
@@ -15,7 +15,7 @@ export default function RootLayout() {
     "Quicksand-Light": require("../assets/fonts/Quicksand-Light.ttf"),
   });
 
-useEffect(() => {
+  useEffect(() => {
     if (error) {
       console.error("Error loading fonts:", error);
       throw error;
@@ -27,16 +27,25 @@ useEffect(() => {
     fetchAuthenticatedUser();
   }, []);
 
-  if(!fontsLoaded || isLoading) {
-    return null; 
+  if (!fontsLoaded || isLoading) {
+    return null;
   }
 
   return <Stack screenOptions={
     {
-      headerShown: false,
       contentStyle: {
         backgroundColor: "#fff",
       },
     }
-  }/>;
+  }>
+    <Stack.Screen name="(tabs)" options={{
+      headerShown: false,
+    }} />
+    <Stack.Screen name="(auth)" options={{
+      headerShown: false,
+    }} />
+    <Stack.Screen name="participant/[id]" options={{title: "Participant Details"}} />
+    <Stack.Screen name="trip/[id]" options={{title: "Trip Details"}} />
+    <Stack.Screen name="trip/create" options={{title: "Create Trip"}} />
+  </Stack>;
 }
