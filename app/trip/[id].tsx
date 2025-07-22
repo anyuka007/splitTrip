@@ -7,7 +7,7 @@ import { formatDate } from '@/utils/helpers';
 import { UpdateTripData } from '@/type';
 import { updateTrip } from '@/lib/trips';
 import CustomButton from '@/components/CustomButton';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const TripDetails = () => {
     const { id } = useLocalSearchParams();
@@ -132,7 +132,7 @@ const TripDetails = () => {
                 )}
             </Pressable>
             <Pressable className="bg-tertiary rounded-full p-2" onPress={() => alert('Update')}>
-                        <FontAwesome5 name="edit" size={24} color="white" />
+                        <FontAwesome name="edit" size={24} color="white" />
                       </Pressable>
             <Text className="text-regular text-center">
                 {`${formatDate(trip.dateStart)} - ${formatDate(trip.dateEnd)}`}

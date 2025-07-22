@@ -64,9 +64,9 @@ export interface SignInParams {
 
 export interface CreateTripParams {
     name: string;
-    dateStart?: string; // ISO date string
+    dateStart: string; // ISO date string
     dateEnd: string;
-    defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
+    defaultCurrency: "EUR" | "USD" | "UAH" | "PLN";
     //ownerId: string; 
     }
 export interface CreateTripData {
