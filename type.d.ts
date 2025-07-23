@@ -92,6 +92,14 @@ export interface UpdateTripData {
     defaultCurrency?: "EUR" | "USD" | "UAH" | "PLN";
 }
 
+export type Currency = "EUR" | "USD" | "UAH" | "PLN";
+
+export interface TripFormData {
+    name: string;
+    startDate: Date;
+    endDate: Date;
+    defaultCurrency: Currency;
+}
 
 export interface CreateParticipantParams {
     name: string;

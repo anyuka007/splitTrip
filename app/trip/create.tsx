@@ -1,20 +1,15 @@
 import CustomButton from '@/components/CustomButton';
 import CustomInput from '@/components/CustomInput';
-import DatePicker from '@/components/testDB/DatePicker';
-import Dropdown from '@/components/testDB/Dropdown';
+import DatePicker from '@/components/DatePicker';
+import Dropdown from '@/components/Dropdown';
 import { createTrip } from '@/lib/trips';
+import { Currency, TripFormData } from '@/type';
+import { formatDateForDB } from '@/utils/helpers';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 
-type Currency = "EUR" | "USD" | "UAH" | "PLN";
 
-interface TripFormData {
-    name: string;
-    startDate: Date;
-    endDate: Date;
-    defaultCurrency: Currency;
-}
 
 const CreateTrip = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,11 +27,7 @@ const CreateTrip = () => {
         { label: 'US Dollar (USD)', value: 'USD' },
         { label: 'Ukrainian Hryvnia (UAH)', value: 'UAH' },
         { label: 'Polish Złoty (PLN)', value: 'PLN' },
-    ];
-
-    const formatDateForDB = (date: Date): string => {
-    return date.toISOString().split('T')[0]; // "2025-07-22"
-};
+    ];    
 
     // Generic updater function
     const updateField = <K extends keyof TripFormData>(field: K, value: TripFormData[K]) => {

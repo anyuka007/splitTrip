@@ -1,7 +1,7 @@
 import { Pressable, Text } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import Avatar from './Avatar';
-import { formatDate } from '@/utils/helpers';
+import { formatDateForDisplay } from '@/utils/helpers';
 import { router } from 'expo-router';
 import { TripWithParticipants } from '@/type';
 
@@ -32,7 +32,7 @@ const TripCard = ({ trip }: TripCardParams) => {
                         {trip.name}
                     </Text>
                     <Text className="text-regular text-xs">
-                        {`${formatDate(trip.dateStart)} - ${formatDate(trip.dateEnd)}`}
+                        {`${formatDateForDisplay(trip.dateStart)} - ${formatDateForDisplay(trip.dateEnd)}`}
                     </Text>
                     <Text className="text-regular text-xs text-myGray mt-1">
                         Currency: {trip.defaultCurrency}

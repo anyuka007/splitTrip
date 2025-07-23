@@ -3,7 +3,7 @@ import useTripsStore from '@/store/trips.store';
 import { Link, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState, useRef } from 'react';
 import { Pressable, Text, TextInput, View, Alert } from 'react-native';
-import { formatDate } from '@/utils/helpers';
+import { formatDateForDisplay } from '@/utils/helpers';
 import { UpdateTripData } from '@/type';
 import { updateTrip } from '@/lib/trips';
 import CustomButton from '@/components/CustomButton';
@@ -135,7 +135,7 @@ const TripDetails = () => {
                         <FontAwesome name="edit" size={24} color="white" />
                       </Pressable>
             <Text className="text-regular text-center">
-                {`${formatDate(trip.dateStart)} - ${formatDate(trip.dateEnd)}`}
+                {`${formatDateForDisplay(trip.dateStart)} - ${formatDateForDisplay(trip.dateEnd)}`}
             </Text>
             <View className='flex flex-row justify-between'>
                 <Text>Currency:</Text>
