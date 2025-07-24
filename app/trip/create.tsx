@@ -3,6 +3,7 @@ import CustomInput from '@/components/CustomInput';
 import DatePicker from '@/components/DatePicker';
 import Dropdown from '@/components/Dropdown';
 import { createTrip } from '@/lib/trips';
+import useAuthStore from '@/store/auth.store';
 import { Currency, TripFormData } from '@/type';
 import { formatDateForDB } from '@/utils/helpers';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -13,8 +14,10 @@ import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
 
 const CreateTrip = () => {
+    
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
+    const {user} = useAuthStore(); // Assuming you have a user store to get the current user
     
     const [formData, setFormData] = useState<TripFormData>({
         name: '',
@@ -23,7 +26,7 @@ const CreateTrip = () => {
         defaultCurrency: 'EUR'
     });
 
-    const [participants, setParticipants] = useState<string[]>([]);
+    const [participants, setParticipants] = useState<string[]>([user!.name]);
     const [isAddParticipant, setIsAddParticipant] = useState(false);
     const [participantName, setParticipantName] = useState('');
 
@@ -32,8 +35,8 @@ const CreateTrip = () => {
         { label: 'US Dollar (USD)', value: 'USD' },
         { label: 'Ukrainian Hryvnia (UAH)', value: 'UAH' },
         { label: 'Polish Złoty (PLN)', value: 'PLN' },
-    ];    
-
+    ];   
+    
     // Generic updater function
     const updateField = <K extends keyof TripFormData>(field: K, value: TripFormData[K]) => {
         setFormData(prev => ({
