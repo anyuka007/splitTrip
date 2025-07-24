@@ -105,7 +105,7 @@ export default function DatePicker({
         { padding: 10 }, 
         containerStyle
       ]} 
-      className="flex flex-row justify-between items-center border-b-[1px]" 
+      className="flex flex-row justify-between items-center createTrip_border" 
       onPress={() => !disabled && setShow(true)}
       disabled={disabled}
     >

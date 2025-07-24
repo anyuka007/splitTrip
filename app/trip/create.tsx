@@ -127,7 +127,7 @@ const CreateTrip = () => {
     //console.log("Form Data:", formData);
 
     return (
-        <ScrollView className='gap-10 bg-white rounded-lg p-5 mt-5'>
+        <ScrollView className='flex gap-4 bg-white  p-5 mt-3' contentContainerStyle={{ gap: 16 }}>
             <CustomInput
                 placeholder="Enter trip name"
                 value={formData.name}
@@ -163,7 +163,7 @@ const CreateTrip = () => {
             </View>
 
             <View className='flex'>
-                <Text className='label'>Participants</Text>
+                <Text className='label'>Participants (maximum 5)</Text>
                 {participants.length > 0 ? participants.map((participant, index) => (
                     <View key={index} className="flex-row items-center gap-5 my-2">
                         <Pressable
@@ -194,7 +194,7 @@ const CreateTrip = () => {
                             value={participantName}
                             onChangeText={(text) => { setParticipantName(text) }}
                         />
-                        <View className='flex-row justify-between'>
+                        <View className='flex-row justify-between my-3'>
                             <CustomButton
                                 text="Add"
                                 onPress={() => addParticipantHandler(participantName)}

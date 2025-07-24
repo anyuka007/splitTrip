@@ -55,7 +55,7 @@ const Dropdown = ({
       {/* Dropdown Container */}
       <View style={[
         {
-          ...(Platform.OS === 'android' && { borderBottomWidth: 1 }),
+          ...(Platform.OS === 'android' && { borderBottomWidth: 1, borderColor: '#ccc' }),
           backgroundColor: disabled ? '#f5f5f5' : 'white',
           
           overflow: 'hidden',
