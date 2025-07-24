@@ -47,5 +47,7 @@ export default function RootLayout() {
     <Stack.Screen name="participant/[id]" options={{title: "Participant Details"}} />
     <Stack.Screen name="trip/[id]" options={{title: "Trip Details"}} />
     <Stack.Screen name="trip/create" options={{title: "Create Trip"}} />
+    <Stack.Screen name="trip/[tripId]/expense/create" options={{title: "Create Expense"}} />
+    <Stack.Screen name="trip/[tripId]/expense/[expenseId]" options={{title: "Expense"}} />
   </Stack>;
 }

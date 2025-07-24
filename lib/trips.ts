@@ -47,7 +47,7 @@ export const getUsersTrips = async (userId: string): Promise<Trip[]> => {
         const response = await databases.listDocuments<Trip>(
             appwriteConfig.databaseId!,
             appwriteConfig.tripsCollectionId!,
-            [Query.select(["*"]), Query.equal("ownerId", userId)]
+            [Query.select(["*"]), Query.equal("ownerId", userId), Query.orderDesc("$createdAt")],
         );
         //console.log("User's trips:", JSON.stringify(response.documents, null, 2));
         return response.documents;
@@ -89,9 +89,6 @@ export const deleteTrip = async (tripId: string): Promise<void> => {
     return await deleteDocument(tripId, appwriteConfig.tripsCollectionId!);
 }
 
-/* export const getExpenses = async (expenseId: string): Promise<Expense> => {
-    return await getDocument<Expense>(expenseId, appwriteConfig.expensesCollectionId!);
-} */
 
 export const updateTrip = async (tripId: string, updateData: Partial<CreateTripParams>): Promise<Trip> => {
     try {

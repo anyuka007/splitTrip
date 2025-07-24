@@ -24,6 +24,16 @@ export interface Participant extends Models.Document {
     tripId: string; // ID of the trip this participant belongs to
 }
 
+export interface Expense extends Models.Document {
+    description: string;
+    amount: number;
+    currency: "EUR" | "USD" | "UAH" | "PLN";
+    date: Date; // ISO date string
+    type: "shared" | "individual" | "sponsored";
+    conversionRate?: number; // Optional
+    convertedAmount?: number; // Optional
+}
+
 export interface TabBarIconProps {
   name: string;
   title: string;

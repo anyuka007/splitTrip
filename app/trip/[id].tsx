@@ -1,13 +1,15 @@
 // app/trip/[id].tsx
 import useTripsStore from '@/store/trips.store';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState, useRef } from 'react';
 import { Pressable, Text, TextInput, View, Alert } from 'react-native';
 import { formatDateForDisplay } from '@/utils/helpers';
-import { UpdateTripData } from '@/type';
+import { Expense, UpdateTripData } from '@/type';
 import { updateTrip } from '@/lib/trips';
 import CustomButton from '@/components/CustomButton';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import {  getExpensesByTripId } from '@/lib/expenses';
 
 const TripDetails = () => {
     const { id } = useLocalSearchParams();
@@ -24,6 +26,29 @@ const TripDetails = () => {
         dateEnd: '',
         defaultCurrency: 'EUR'
     });
+
+    const [expenseList, setExpenseList] = useState<Expense[]>([]);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+    const fetchExpenses = async () => {
+        try {
+            setLoading(true);
+            const result = await getExpensesByTripId(tripId); // Call the function
+            setExpenseList(result);
+        } catch (error) {
+            console.error("Error fetching expenses:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (tripId) {
+        fetchExpenses();
+    }
+}, [tripId]);
+
+
 
     // *** Double-tap implementation
     const tapCount = useRef(0);
@@ -131,7 +156,7 @@ const TripDetails = () => {
                     </View>
                 )}
             </Pressable>
-            <Pressable className="bg-tertiary rounded-full p-2" onPress={() => alert('Update')}>
+            <Pressable className="bg-tertiary rounded-full p-2" onPress={() => router.push(`/trip/edit/${tripId}`)}>
                         <FontAwesome name="edit" size={24} color="white" />
                       </Pressable>
             <Text className="text-regular text-center">
@@ -153,12 +178,26 @@ const TripDetails = () => {
         </View>
         <View className='flex  pb-4 mb-4 w-full '>
              <Text className='h2'>Expenses</Text>
-            <CustomButton text='Add Expense' onPress={() => {Alert.alert('Add Expense Pressed');}} />
-            <Text>Expense 1</Text>
-            <Text>Expense 2</Text>
-            <Text>Expense 3</Text>
+            
+
+            {expenseList && expenseList.length > 0 ? (
+                expenseList.map((expense: Expense, index: number) => (
+                    <View key={index} className="flex-row items-center justify-between my-2">
+                        <Text>{expense.description}</Text>
+                        <Text>{`${formatDateForDisplay(expense.date.toLocaleString())} `}</Text>
+                        <Text>{`${expense.amount} `}</Text>
+                        <Text>{`${expense.payerId}`}</Text>
+                        <Pressable onPress={() => router.push(`/trip/${tripId}/expense/${expense.$id}`)}>
+                            <FontAwesome name="eye" size={24} color="gray-500" />
+                        </Pressable>
+                    </View>
+                ))
+            ) : (
+                <Text>No expenses found</Text>
+            )} 
+            <CustomButton text='Add Expense' onPress={() => router.push(`/trip/${tripId}/expense/create`)} />     
         </View>
-        </View>
+    </View>
     );
 }
 
