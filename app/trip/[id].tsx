@@ -186,9 +186,10 @@ useEffect(() => {
                         <Text>{expense.description}</Text>
                         <Text>{`${formatDateForDisplay(expense.date.toLocaleString())} `}</Text>
                         <Text>{`${expense.amount} `}</Text>
-                        <Text>{`${expense.payerId}`}</Text>
+                        <Text>{`${expense.currency} `}</Text>
+                        {/* <Text>{`${expense.payerId}`}</Text> */}
                         <Pressable onPress={() => router.push(`/trip/${tripId}/expense/${expense.$id}`)}>
-                            <FontAwesome name="eye" size={24} color="gray-500" />
+                            <FontAwesome name="info-circle" size={24} color="#959090ff" />
                         </Pressable>
                     </View>
                 ))

@@ -35,3 +35,12 @@ export const createExpense = async (expenseData: ExpenseData): Promise<Expense> 
     }
 };
 
+export const getExpense = async (expenseId: string): Promise<Expense> => {
+    try {
+        const expense = await getDocument<Expense>(expenseId, appwriteConfig.expensesCollectionId!);
+        return expense;
+    } catch (error) {
+        console.error("Error fetching expense:", error);
+        throw error;
+    }
+}
