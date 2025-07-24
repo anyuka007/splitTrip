@@ -29,11 +29,11 @@
     }
 
 .label {
-        @apply text-base text-start w-full font-quicksand-medium text-gray-500 pl-2;
+        @apply text-base text-start w-full font-quicksand-medium text-gray-500 ;
     }
 
 .input {
-        @apply rounded-lg px-3 py-1 w-full text-base font-quicksand-semibold text-gray-500 border-b leading-5;
+        @apply rounded-lg  py-1 w-full text-base font-quicksand-semibold text-gray-500 border-b leading-5;
     }
 
  

@@ -5,9 +5,10 @@ import Dropdown from '@/components/Dropdown';
 import { createTrip } from '@/lib/trips';
 import { Currency, TripFormData } from '@/type';
 import { formatDateForDB } from '@/utils/helpers';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
 
 
@@ -21,6 +22,10 @@ const CreateTrip = () => {
         endDate: new Date(),
         defaultCurrency: 'EUR'
     });
+
+    const [participants, setParticipants] = useState<string[]>([]);
+    const [isAddParticipant, setIsAddParticipant] = useState(false);
+    const [participantName, setParticipantName] = useState('');
 
     const currencies = [
         { label: 'Euro (EUR)', value: 'EUR' },
@@ -36,6 +41,15 @@ const CreateTrip = () => {
             [field]: value
         }));
     };
+
+    const addParticipantHandler = (name: string) => {
+        if (!name.trim()) {
+            return Alert.alert("Error", "Please enter participant name");
+        }
+        setParticipants(prev => [...prev, name]);
+        setParticipantName('');
+        setIsAddParticipant(false);
+    }
 
       const submit = async () => {
         const { name, startDate, endDate, defaultCurrency } = formData;
@@ -69,7 +83,7 @@ const CreateTrip = () => {
     //console.log("Form Data:", formData);
 
     return (
-        <View className='gap-10 bg-white rounded-lg p-5 mt-5'>
+        <ScrollView className='gap-10 bg-white rounded-lg p-5 mt-5'>
             <CustomInput 
                 placeholder="Enter trip name" 
                 value={formData.name} 
@@ -103,13 +117,61 @@ const CreateTrip = () => {
                     pickerStyle={{ height: 60 }}
                 />
             </View>
+
+            <View className='flex'>
+                <Text className='label'>Participants</Text>
+                {participants.length > 0 ? participants.map((participant, index) => (
+                    <View key={index} className="flex-row items-center gap-5 my-2">
+                        <Pressable
+                            onPress={() => setParticipants(prev => prev.filter((_, i) => i !== index))}
+                            className="px-2"
+                        >
+                            <FontAwesome name="remove" size={24} color="#e45f2b" />
+                        </Pressable>
+                        <Text>{participant}</Text>
+                    </View>
+                )) : (
+                    <Text className={!isAddParticipant ? "text-gray-500" : "hidden"}>No participants</Text>
+                )}
+                <View className='flex items-end'>
+                <Pressable
+                    onPress={() => setIsAddParticipant(true)}
+                    className={isAddParticipant ? 'hidden' : 'bg-secondary w-1/2 h-12 flex flex-row items-center justify-center rounded-xl my-2 gap-2'}
+                >
+                    <FontAwesome name="plus" size={16} color="white" />
+                    <Text className="text-white font-medium">Add Participant</Text>
+                </Pressable>
+                </View>
+
+                { isAddParticipant && (
+                    <View>
+                    <CustomInput
+                        placeholder="Enter participant name"
+                        value={participantName}
+                        onChangeText={(text) => setParticipantName(text)}
+                    />
+                    <View className='flex-row justify-between'>
+                        <CustomButton
+                            text="Add"
+                            onPress={()=>addParticipantHandler(participantName)}
+                            classname='w-[45%] h-12 bg-secondary rounded-xl my-2 flex items-center justify-center'
+                        />
+                        <CustomButton
+                            text="Cancel"
+                            onPress={()=>setIsAddParticipant(false)}
+                            classname='w-[45%] h-12 bg-tertiary rounded-xl my-2 flex items-center justify-center'
+                        />
+                        </View>
+                    </View>
+                )}
+            </View>
             
             <CustomButton 
                 text="Create Trip" 
                 isLoading={isSubmitting} 
                 onPress={submit} 
             />
-        </View>
+        </ScrollView>
     );
 };
 

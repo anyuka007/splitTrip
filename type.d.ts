@@ -41,7 +41,7 @@ export interface CustomButtonProps {
 export interface CustomInputProps {
     placeholder?: string;
     value?: string;    
-    label: string;
+    label?: string;
     secureTextEntry?: boolean;
     keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";onChangeText?: (text: string) => void;
 }
