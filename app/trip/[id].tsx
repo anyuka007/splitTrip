@@ -14,7 +14,7 @@ import ExpenseItem from '@/components/ExpenseItem';
 
 const TripDetails = () => {
     const { id } = useLocalSearchParams();
-    const { trips, editTrip } = useTripsStore();
+    const { trips, editTrip, fetchExpenses, getExpensesForTrip } = useTripsStore();
 
     // Handle id type properly
     const tripId = Array.isArray(id) ? id[0] : id;
@@ -28,26 +28,14 @@ const TripDetails = () => {
         defaultCurrency: 'EUR'
     });
 
-    const [expenseList, setExpenseList] = useState<Expense[]>([]);
-const [loading, setLoading] = useState(true);
+    const expenseList = getExpensesForTrip(tripId!); // Use the store's selector to get expenses for this trip
 
 useEffect(() => {
-    const fetchExpenses = async () => {
-        try {
-            setLoading(true);
-            const result = await getExpensesByTripId(tripId); // Call the function
-            setExpenseList(result);
-        } catch (error) {
-            console.error("Error fetching expenses:", error);
-        } finally {
-            setLoading(false);
+        if (tripId) {
+            console.log("Calling fetchExpenses for tripId:", tripId);
+            fetchExpenses(tripId); // ✅ Rufen Sie fetchExpenses auf!
         }
-    };
-
-    if (tripId) {
-        fetchExpenses();
-    }
-}, [tripId]);
+    }, [tripId, fetchExpenses]);
 
 
 

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { TripWithParticipants } from '@/type';
+import { Expense, TripWithParticipants } from '@/type';
 import { getTripsWithParticipants, updateTrip, } from '@/lib/trips';
+import { getExpensesByTripId } from '@/lib/expenses';
 
 
 interface TripsState {
@@ -8,10 +9,21 @@ interface TripsState {
   trips: TripWithParticipants[];
   loading: boolean;
   error: string | null;
+  expenses: Expense[];
+
+  // Expenses State
+  expensesByTrip: { [tripId: string]: Expense[] };
+  expensesLoading: boolean;
   
   // Trip Actions
   fetchTrips: (userId: string) => Promise<void>;
   editTrip: (tripId: string, data: Partial<TripWithParticipants>) => Promise<void>;
+
+// Expense Actions
+  fetchExpenses: (tripId: string) => Promise<void>;
+
+  //Selectors
+  getExpensesForTrip: (tripId: string) => Expense[]
 }
 
 const useTripsStore = create<TripsState>((set, get) => ({
@@ -19,6 +31,9 @@ const useTripsStore = create<TripsState>((set, get) => ({
   trips: [],
   loading: false,
   error: null,
+  expenses: [],
+  expensesByTrip: {},
+  expensesLoading: false,
 
   // Trip Actions
   fetchTrips: async (userId: string) => {
@@ -62,7 +77,33 @@ const useTripsStore = create<TripsState>((set, get) => ({
     }
   },
 
-  
+  fetchExpenses: async (tripId: string) => {
+    try {
+      set({ expensesLoading: true, error: null });
+      const expenses = await getExpensesByTripId(tripId);
+      console.log("Expenses fetched successfully:", JSON.stringify(expenses, null, 2));
+
+      set((state) => ({
+        expensesByTrip: {
+          ...state.expensesByTrip,
+          [tripId]: expenses
+        },
+        expensesLoading: false
+      }));
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to fetch expenses',
+        expensesLoading: false 
+      });
+    }
+  },
+
+  // Selectors
+  getExpensesForTrip: (tripId: string) => {
+    return get().expensesByTrip[tripId] || [];
+  }
+
 }));
 
 export default useTripsStore;
