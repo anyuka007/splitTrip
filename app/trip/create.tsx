@@ -45,13 +45,21 @@ const CreateTrip = () => {
         }));
     };
 
+    const isDuplicateParticipant = (name: string) => {
+        return participants.some(participant => participant.toLowerCase() === name.toLowerCase());
+    };
+
     const addParticipantHandler = (name: string) => {
         if (!name.trim()) {
-            return Alert.alert("Error", "Please enter participant name");
+            return Alert.alert("Please enter participant name");
+        }
+
+        if (isDuplicateParticipant(name)) {
+            return Alert.alert("Participant already exists");
         }
         setParticipants(prev => [...prev, name]);
-        setParticipantName('');
         setIsAddParticipant(false);
+        setParticipantName('');
     }
 
       const submit = async () => {
@@ -151,7 +159,7 @@ const CreateTrip = () => {
                     <CustomInput
                         placeholder="Enter participant name"
                         value={participantName}
-                        onChangeText={(text) => setParticipantName(text)}
+                        onChangeText={(text) => {setParticipantName(text)}}
                     />
                     <View className='flex-row justify-between'>
                         <CustomButton
@@ -161,7 +169,7 @@ const CreateTrip = () => {
                         />
                         <CustomButton
                             text="Cancel"
-                            onPress={()=>setIsAddParticipant(false)}
+                            onPress={()=>{setIsAddParticipant(false); setParticipantName('')}}
                             classname='w-[45%] h-12 bg-tertiary rounded-xl my-2 flex items-center justify-center'
                         />
                         </View>
