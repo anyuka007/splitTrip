@@ -33,8 +33,9 @@ const CreateExpense = () => {
 
   const expenseData: ExpenseLike= {
         description: 'New Expense',
-        amount: 3000,
-        currency: trip?.defaultCurrency || 'EUR',
+        amount: 2000,
+        // currency: trip?.defaultCurrency || 'EUR',
+        currency: 'USD', // Fixed: no more empty string
         date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
         type: "shared",
         tripId: tripId as string,

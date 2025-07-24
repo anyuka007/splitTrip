@@ -10,6 +10,7 @@ import CustomButton from '@/components/CustomButton';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import {  getExpensesByTripId } from '@/lib/expenses';
+import ExpenseItem from '@/components/ExpenseItem';
 
 const TripDetails = () => {
     const { id } = useLocalSearchParams();
@@ -181,17 +182,8 @@ useEffect(() => {
             
 
             {expenseList && expenseList.length > 0 ? (
-                expenseList.map((expense: Expense, index: number) => (
-                    <View key={index} className="flex-row items-center justify-between my-2">
-                        <Text>{expense.description}</Text>
-                        <Text>{`${formatDateForDisplay(expense.date.toLocaleString())} `}</Text>
-                        <Text>{`${expense.amount}${expense.currency} `}</Text>
-                        <Text>{trip.participants.find(p => p.$id === expense.payerId)?.name}</Text>
-                        {/* <Text>{`${expense.payerId}`}</Text> */}
-                        <Pressable onPress={() => router.push(`/trip/${tripId}/expense/${expense.$id}`)}>
-                            <FontAwesome name="info-circle" size={24} color="#959090ff" />
-                        </Pressable>
-                    </View>
+                expenseList.map((expense: Expense) => (
+                    <ExpenseItem key={expense.$id} trip={trip} expense={expense} />
                 ))
             ) : (
                 <Text>No expenses found</Text>
