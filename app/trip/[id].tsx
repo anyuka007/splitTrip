@@ -185,8 +185,8 @@ useEffect(() => {
                     <View key={index} className="flex-row items-center justify-between my-2">
                         <Text>{expense.description}</Text>
                         <Text>{`${formatDateForDisplay(expense.date.toLocaleString())} `}</Text>
-                        <Text>{`${expense.amount} `}</Text>
-                        <Text>{`${expense.currency} `}</Text>
+                        <Text>{`${expense.amount}${expense.currency} `}</Text>
+                        <Text>{trip.participants.find(p => p.$id === expense.payerId)?.name}</Text>
                         {/* <Text>{`${expense.payerId}`}</Text> */}
                         <Pressable onPress={() => router.push(`/trip/${tripId}/expense/${expense.$id}`)}>
                             <FontAwesome name="info-circle" size={24} color="#959090ff" />

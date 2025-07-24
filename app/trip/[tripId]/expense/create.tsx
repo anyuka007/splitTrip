@@ -5,12 +5,14 @@ import { Expense } from '@/type';
 import { formatDateForDisplay } from '@/utils/helpers';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 interface CreateExpenseProps {
     tripId: string;
 
 }
+
+export type ExpenseLike = Pick<Expense, 'description' | 'amount' | 'currency' | 'date' | 'type' | 'conversionRate' | 'convertedAmount' | 'tripId' | 'payerId'>;
 
 export interface ExpenseData {
     description: string;
@@ -29,9 +31,9 @@ const CreateExpense = () => {
     const {trips} = useTripsStore();
     const trip = trips.find(t => t.$id === tripId);
 
-  const expenseData: ExpenseData = {
+  const expenseData: ExpenseLike= {
         description: 'New Expense',
-        amount: 30,
+        amount: 3000,
         currency: trip?.defaultCurrency || 'EUR',
         date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
         type: "shared",
@@ -39,7 +41,7 @@ const CreateExpense = () => {
         payerId: "68823df400278fc17ad6"
     };  
 
-    const createExpenseHandler = async (expenseData: ExpenseData):  Promise<Expense> => {
+    const createExpenseHandler = async (expenseData: ExpenseLike):  Promise<Expense> => {
         try {
             const expense = await createExpense(expenseData);
             router.push(`/trip/${tripId}`);

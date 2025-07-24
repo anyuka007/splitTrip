@@ -32,6 +32,8 @@ export interface Expense extends Models.Document {
     type: "shared" | "individual" | "sponsored";
     conversionRate?: number; // Optional
     convertedAmount?: number; // Optional
+    tripId: string; // ID of the trip this expense belongs to
+    payerId: string; // ID of the participant who paid for the expense
 }
 
 export interface TabBarIconProps {
