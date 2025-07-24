@@ -51,9 +51,9 @@ export default function DatePicker({
   const [show, setShow] = useState(false);
 
   const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    console.log('Raw event:', event);
-    console.log('Selected date:', selectedDate);
-    
+    // console.log('Raw event:', event);
+    // console.log('Selected date:', selectedDate);
+
     // Handle dismissed event
     if (event && event.type === 'dismissed') {
         setShow(false);
