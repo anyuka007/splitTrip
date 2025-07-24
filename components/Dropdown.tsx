@@ -1,6 +1,6 @@
 import React from 'react';
 import { Picker } from '@react-native-picker/picker';
-import { View, Text, ViewStyle, TextStyle } from 'react-native';
+import { View, Text, ViewStyle, TextStyle, Platform } from 'react-native';
 
 interface DropdownItem {
   label: string;
@@ -55,8 +55,10 @@ const Dropdown = ({
       {/* Dropdown Container */}
       <View style={[
         {
-          borderBottomWidth: 1,
+          ...(Platform.OS === 'android' && { borderBottomWidth: 1 }),
           backgroundColor: disabled ? '#f5f5f5' : 'white',
+          
+          overflow: 'hidden',
         },
         dropdownStyle
       ]}>
@@ -65,7 +67,7 @@ const Dropdown = ({
           onValueChange={(itemValue) => onValueChange(itemValue)}
           enabled={!disabled}
           style={[
-            { height: 50,
+            { ...(Platform.OS === 'android' ? { height: 50 } : { height: 80, marginBottom: 40 }),
               color: disabled ? '#999' : '#000'
             }, 
           ]}
