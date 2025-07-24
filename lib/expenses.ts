@@ -27,7 +27,7 @@ export const createExpense = async (expenseData: ExpenseData): Promise<Expense> 
             ID.unique(),
             expenseData
         );
-        console.log("New expense created:", JSON.stringify(response, null, 2));
+        //console.log("New expense created:", JSON.stringify(response, null, 2));
         return response;
     } catch (error) {
         console.error("Error creating expense:", error);

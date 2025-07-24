@@ -35,7 +35,7 @@ const ExpenseDetails = ({ }: ExpenseDetailsProps) => {
             <Text>{expense.currency}</Text>
             <Text>{formatDateForDisplay(expense.date.toLocaleString())}</Text>
             <Text>{trip?.participants.map(participant => participant.name).join(', ')}</Text>
-            <Text>Paid by: {payer ? payer.name : 'Unknown'}</Text>
+            <Text>Paid by: {payer?.name}</Text>
         </>
     )}
     </View>

@@ -81,7 +81,7 @@ const useTripsStore = create<TripsState>((set, get) => ({
     try {
       set({ expensesLoading: true, error: null });
       const expenses = await getExpensesByTripId(tripId);
-      console.log("Expenses fetched successfully:", JSON.stringify(expenses, null, 2));
+      //console.log("Expenses fetched successfully:", JSON.stringify(expenses, null, 2));
 
       set((state) => ({
         expensesByTrip: {

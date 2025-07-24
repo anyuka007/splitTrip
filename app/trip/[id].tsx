@@ -32,7 +32,6 @@ const TripDetails = () => {
 
 useEffect(() => {
         if (tripId) {
-            console.log("Calling fetchExpenses for tripId:", tripId);
             fetchExpenses(tripId); // ✅ Rufen Sie fetchExpenses auf!
         }
     }, [tripId, fetchExpenses]);
