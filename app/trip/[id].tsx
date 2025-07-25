@@ -165,7 +165,7 @@ useEffect(() => {
             </View>
         </View>
         <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full '>
-            <Text>Balance</Text>
+            <Text className='h2'>Balance</Text>
         </View>
         <View className='flex  pb-4 mb-4 w-full '>
              <Text className='h2'>Expenses</Text>
@@ -176,7 +176,7 @@ useEffect(() => {
                     <ExpenseItem key={expense.$id} trip={trip} expense={expense} />
                 ))
             ) : (
-                <Text>No expenses found</Text>
+                <Text className='text-regular'>No expenses found</Text>
             )} 
             <CustomButton text='Add Expense' onPress={() => router.push(`/trip/${tripId}/expense/create`)} />     
         </View>

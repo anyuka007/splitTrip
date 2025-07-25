@@ -55,11 +55,11 @@ const CreateExpense = () => {
 
   return (
     <View>
-      <Text>CreateExpense</Text>
+      <Text className='text-regular'>CreateExpense</Text>
       {trip && (
         <>
-          <Text>Trip Name: {trip.name}</Text>
-          <Text>Trip Date: {formatDateForDisplay(trip.dateStart)} - {formatDateForDisplay(trip.dateEnd)}</Text>
+          <Text className='text-regular'>Trip Name: {trip.name}</Text>
+          <Text className='text-regular'>Trip Date: {formatDateForDisplay(trip.dateStart)} - {formatDateForDisplay(trip.dateEnd)}</Text>
           <CustomButton text="Create Expense" onPress={() => createExpenseHandler(expenseData)} /> 
         </>
       )}

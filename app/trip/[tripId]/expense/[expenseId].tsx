@@ -30,12 +30,12 @@ const ExpenseDetails = ({ }: ExpenseDetailsProps) => {
     ) : (
         <>
             <Text>{expenseId}</Text>
-            <Text>{trip.name}</Text>
-            <Text>{expense.amount}</Text>
-            <Text>{expense.currency}</Text>
-            <Text>{formatDateForDisplay(expense.date.toLocaleString())}</Text>
-            <Text>{trip?.participants.map(participant => participant.name).join(', ')}</Text>
-            <Text>Paid by: {payer?.name}</Text>
+            <Text className='text-regular'>{trip.name}</Text>
+            <Text className='text-regular'>{expense.amount}</Text>
+            <Text className='text-regular'>{expense.currency}</Text>
+            <Text className='text-regular'>{formatDateForDisplay(expense.date.toLocaleString())}</Text>
+            <Text className='text-regular'>{trip?.participants.map(participant => participant.name).join(', ')}</Text>
+            <Text className='text-regular'>Paid by: {payer?.name}</Text>
         </>
     )}
     </View>

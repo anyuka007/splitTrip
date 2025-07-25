@@ -65,7 +65,7 @@ export default function Index() {
           ListEmptyComponent={() => (
             <View className="flex justify-center items-center mt-10">
               <Text className="text-regular text-myGray">No trips found</Text>
-              <Text className="text-xs text-myGray mt-2">Create your first trip!</Text>
+              <Text className="text-regular text-xs text-myGray mt-2">Create your first trip!</Text>
             </View>
           )}
 

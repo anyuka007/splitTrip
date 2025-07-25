@@ -172,18 +172,19 @@ const CreateTrip = () => {
                         >
                             <FontAwesome name="remove" size={24} color="#e45f2b" />
                         </Pressable>
-                        <Text>{participant}</Text>
+                        <Text className='text-regular'>{participant}</Text>
                     </View>
                 )) : (
-                    <Text className={!addParticipantMode ? "text-gray-500" : "hidden"}>No participants</Text>
+                    <Text className={!addParticipantMode ? "text-gray-500 text-regular" : "hidden"}>No participants</Text>
                 )}
                 <View className='flex items-end'>
                     <Pressable
+                        disabled={participants.length >= 5}
                         onPress={() => setAddParticipantMode(true)}
-                        className={addParticipantMode ? 'hidden' : 'bg-secondary w-1/2 h-12 flex flex-row items-center justify-center rounded-xl my-2 gap-2'}
+                        className={addParticipantMode ? 'hidden' : participants.length >= 5 ? 'bg-secondary opacity-50 w-1/2 h-12 flex flex-row items-center justify-center rounded-xl my-2 gap-2' : 'bg-secondary w-1/2 h-12 flex flex-row items-center justify-center rounded-xl my-2 gap-2'}
                     >
                         <FontAwesome name="plus" size={16} color="white" />
-                        <Text className="text-white font-medium">Add Participant</Text>
+                        <Text className="text-regular text-white font-medium">Add Participant</Text>
                     </Pressable>
                 </View>
 
@@ -199,6 +200,7 @@ const CreateTrip = () => {
                                 text="Add"
                                 onPress={() => addParticipantHandler(participantName)}
                                 classname='w-[45%] h-12 bg-secondary rounded-xl my-2 flex items-center justify-center'
+                                disabled={!participantName.trim()}
                             />
                             <CustomButton
                                 text="Cancel"

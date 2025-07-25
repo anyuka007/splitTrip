@@ -13,7 +13,7 @@ const TabBarIcon = ({ name, title, focused, size = 24 }: TabBarIconProps) => (
             size={size}
             color={focused ? "#f6c445" : "#9AC1F0"}
         />
-        <Text className={cn('text-small font-semibold', focused ? 'text-[#f6c445]':'text-[#9AC1F0]')}>
+        <Text className={cn('text-regular font-bold', focused ? 'text-[#f6c445]':'text-[#9AC1F0]')}>
             {title}
         </Text>
     </View>

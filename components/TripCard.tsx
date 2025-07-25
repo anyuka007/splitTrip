@@ -48,11 +48,11 @@ const TripCard = ({ trip }: TripCardParams) => {
                                 <Avatar key={participant.$id} name={participant.name} />
                             ))
                         ) : (
-                            <Text className="text-xs text-myGray">No participants</Text>
+                            <Text className="text-regular text-xs text-myGray">No participants</Text>
                         )}
                         {trip.participants.length > 3 && (
-                            <View className="bg-myGray rounded-full w-8 h-8 justify-center items-center ml-1">
-                                <Text className="text-white text-xs">+{trip.participants.length - 3}</Text>
+                            <View className="bg-gray-300 rounded-full w-8 h-8 justify-center items-center ml-1">
+                                <Text className="text-regulartext-white text-xs">+{trip.participants.length - 3}</Text>
                             </View>
                         )}
                     </View>
