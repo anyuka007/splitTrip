@@ -10,7 +10,9 @@ import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, } from 'react-native';
+import CheckBox, { Checkbox } from 'expo-checkbox';
+//import CheckBox from 'expo-checkbox';
 
 interface CreateExpenseProps {
   tripId: string;
@@ -34,10 +36,11 @@ export interface ExpenseData {
 const CreateExpense = () => {
   const { tripId } = useLocalSearchParams();
   const { trips } = useTripsStore();
-
-  const [expense, setExpense] = useState<ExpenseLike>({ description: "", amount: 0, currency: "EUR", date: new Date(), type: "individual", tripId: tripId as string, payerId: "" });
-
   const trip = trips.find(t => t.$id === tripId);
+
+  const [expense, setExpense] = useState<ExpenseLike>({ description: "", amount: 0, currency: trip?.defaultCurrency || "EUR", date: new Date(), type: "individual", tripId: tripId as string, payerId: "" });
+  
+  const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   const expenseData: ExpenseLike = {
     description: 'New Expense',
@@ -88,11 +91,21 @@ const CreateExpense = () => {
             onChangeText={(text) => setExpense({ ...expense, amount: Number(text) })}
           />
           <View className='flex'>
-            <Text className='label'>Trip currency</Text>
+            <Text className='label'>Expence currency</Text>
             <Dropdown
               items={currencies}
               selectedValue={expense.currency}
               onValueChange={(currency) => setExpense({ ...expense, currency: currency as Currency })}
+              pickerStyle={{ height: 60 }}
+            />
+          </View>
+          <View className='flex'>
+            <Text className='label'>Payer</Text>
+            <Dropdown
+              items={trip.participants.map(p => ({ label: p.name, value: p.$id }))}
+              selectedValue={expense.payerId}
+              onValueChange={(payerId) => setExpense({ ...expense, payerId })}
+              placeholder="Select Payer"
               pickerStyle={{ height: 60 }}
             />
           </View>
@@ -104,6 +117,16 @@ const CreateExpense = () => {
               onValueChange={(type) => setExpense({ ...expense, type: type as ExpenseType })}
               pickerStyle={{ height: 60 }}
             />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }}>
+              <Checkbox
+                value={toggleCheckBox}
+                onValueChange={setToggleCheckBox}
+                color={toggleCheckBox ? '#4630EB' : undefined}
+              />
+              <Text style={{ marginLeft: 8 }}>
+                Split equally among participants
+              </Text>
+            </View>
           </View>
           <CustomButton text="Create Expense" onPress={() => createExpenseHandler(expenseData)} />
         </>
