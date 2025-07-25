@@ -39,9 +39,11 @@ const CreateExpense = () => {
   const { trips } = useTripsStore();
   const trip = trips.find(t => t.$id === tripId);
 
-  const [expense, setExpense] = useState<ExpenseLike>({ description: "", amount: 0, currency: trip?.defaultCurrency || "EUR", date: new Date(), type: "individual", tripId: tripId as string, payerId: "" });
-  
-  const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
+  const [expense, setExpense] = useState<ExpenseLike>({ description: "", amount: 0, currency: trip?.defaultCurrency || "EUR", date: new Date(), type: "individual", tripId: tripId as string, payerId: trip?.participants[0].$id || "" });
+
+  const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
+    trip?.participants.map(p => p.$id) || []
+  );
 
   // Participant selection toggle function
   const toggleParticipant = (participantId: string) => {
@@ -60,7 +62,9 @@ const CreateExpense = () => {
   const toggleAllParticipants = () => {
     if (selectedParticipants.length === trip?.participants.length) {
       // Deselect all
-      setSelectedParticipants([]);
+      setSelectedParticipants([expense.payerId]);
+      console.log("selectedParticipants:", selectedParticipants); // Ensure payer is always included
+      console.log("payer.id:", expense.payerId); // Ensure payer is always included
     } else {
       // Select all
       setSelectedParticipants(trip?.participants.map(p => p.$id) || []);
@@ -103,12 +107,16 @@ const CreateExpense = () => {
         <>
           <Text className='text-regular'>Trip Name: {trip.name}</Text>
           <Text className='text-regular'>Trip Date: {formatDateForDisplay(trip.dateStart)} - {formatDateForDisplay(trip.dateEnd)}</Text>
+          
+          
           <CustomInput
             placeholder="Enter expense description"
             label='Expense Description'
             value={expense.description}
             onChangeText={(text) => setExpense({ ...expense, description: text })}
           />
+
+
           <View>
             <Text className="label">Date</Text>
             <DatePicker
@@ -116,12 +124,16 @@ const CreateExpense = () => {
               onDateChange={(date) => setExpense({ ...expense, date })}
             />
           </View>
+
+
           <CustomInput
             placeholder="Enter expense amount"
             label='Amount'
             value={expense.amount.toString()}
             onChangeText={(text) => setExpense({ ...expense, amount: Number(text) })}
           />
+
+
           <View className='flex'>
             <Text className='label'>Expence currency</Text>
             <Dropdown
@@ -131,6 +143,8 @@ const CreateExpense = () => {
               pickerStyle={{ height: 60 }}
             />
           </View>
+
+
           <View className='flex'>
             <Text className='label'>Payer</Text>
             <Dropdown
@@ -141,6 +155,8 @@ const CreateExpense = () => {
               pickerStyle={{ height: 60 }}
             />
           </View>
+
+
           <View className='flex'>
             <Text className='label'>Type of expense</Text>
             <Dropdown
@@ -149,49 +165,95 @@ const CreateExpense = () => {
               onValueChange={(type) => setExpense({ ...expense, type: type as ExpenseType })}
               pickerStyle={{ height: 60 }}
             />
-            <View className='flex'>
-            <Text className='label'>
-              Select participants who should pay for this expense
-            </Text>
 
-            {/* Select All/None Button */}
-            <View style={{ marginBottom: 8 }}>
-              <CustomCheckbox
-                isChecked={selectedParticipants.length === trip.participants.length}
-                onToggle={toggleAllParticipants}
-                label={`Select All (${selectedParticipants.length}/${trip.participants.length})`}
-                color="#007bff"
-              />
-            </View>
+
+            <View className='flex'>
+      {expense.type === "individual" ? (
+        <Text className='label'>Individual Expense</Text>
+      ) : (
+        <>
+          <Text className='label'>
+            Select participants who should pay for this expense
+          </Text>
+
+          {/* Select All/None Button */}
+          <View style={{ marginBottom: 8 }}>
+            <CustomCheckbox
+              isChecked={selectedParticipants.length === trip.participants.length }
+              onToggle={toggleAllParticipants}
+              label={`Select All`}
+              color="#007bff"
+            />
+          </View>
+
+{/* Individual Participant Checkboxes */}
+{expense.type === "shared" && (
+  <>
+    {trip.participants.map((participant: Participant) => (
+      <View key={participant.$id} className='flex flex-row justify-between items-center'>
+        <CustomCheckbox
+          isChecked={selectedParticipants.includes(participant.$id)}
+          onToggle={() => toggleParticipant(participant.$id)}
+          label={`${participant.name}${participant.$id === expense.payerId ? ' (Payer)' : ''}`}
+          color={participant.$id === expense.payerId ? '#28a745' : '#f6c445'}
+          disabled={participant.$id === expense.payerId}
+        />
+        {expense.amount && selectedParticipants.length > 0 && selectedParticipants.includes(participant.$id) && (
+          <Text>
+            {Number((expense.amount / selectedParticipants.length).toFixed(2))} {expense.currency}
+          </Text>
+        )}
+      </View>
+    ))}
+    {/* Error message if no participants selected */}
+    {selectedParticipants.length < 2 && (
+      <Text className='text-tertiary text-regular text-sm mt-2'>
+        Please select at least one participant
+      </Text>
+    )}
+  </>
+)}
+
+{expense.type === "sponsored" && (
+  <>
+    {trip.participants.map((participant: Participant) => {
+      const isPayer = participant.$id === expense.payerId;
+      const isSelected = selectedParticipants.includes(participant.$id);
+
+      return (
+        <View key={participant.$id} className='flex flex-row justify-between items-center'>
+          <CustomCheckbox
+            isChecked={isPayer || isSelected} // Payer is always "selected" for sponsored
+            onToggle={() => !isPayer && toggleParticipant(participant.$id)}
+            label={`${participant.name}${isPayer ? ' (Sponsor)' : ''}`}
+            color={isPayer ? '#28a745' : '#f6c445'}
+            disabled={isPayer} // Sponsor can't be unchecked
+          />
+          {expense.amount && (isPayer || isSelected) && (
+            <Text>
+              {isPayer
+                ? `Pays: ${expense.amount} ${expense.currency}`
+                : `${Number((expense.amount / (selectedParticipants.length - 1)).toFixed(2))} ${expense.currency}`
+              }
+            </Text>
+          )}
+        </View>
+      );
+    })}
+    {/* Error message if no participants selected */}
+    {selectedParticipants.length < 2 && (
+      <Text className='text-tertiary text-regular text-sm mt-2'>
+        Please select at least one participant
+      </Text>
+    )}
+  </>
+)}
+         
+          
+        </>
+      )}
 
             
-           {/* Individual Participant Checkboxes */}
-            {trip.participants.map((participant: Participant) => (
-              <View key={participant.$id} className='flex flex-row justify-between items-center'>
-                <CustomCheckbox
-                
-                isChecked={selectedParticipants.includes(participant.$id)}
-                onToggle={() => toggleParticipant(participant.$id)}
-                label={`${participant.name}${participant.$id === expense.payerId ? ' (Payer)' : ''}`}
-                color={participant.$id === expense.payerId ? '#28a745' : '#f6c445'}
-                disabled={participant.$id === expense.payerId} // Payer kann nicht abgewählt werden
-              />
-              {expense.amount && selectedParticipants.length > 0 && (
-                <Text>
-                  {Number((expense.amount / selectedParticipants.length).toFixed(2))}
-                  {expense.currency}
-                </Text>
-              )}
-            </View>
-          ))}
-
-            {/* Error message if no participants selected */}
-
-            {selectedParticipants.length === 0 && (
-              <Text className='text-tertiary text-regulartext-sm mt-2'>
-                Please select at least one participant
-              </Text>
-            )}
           </View>
           </View>
           <CustomButton text="Create Expense" onPress={() => createExpenseHandler(expenseData)} />
