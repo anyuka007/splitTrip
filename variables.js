@@ -4,3 +4,8 @@
         { label: 'Ukrainian Hryvnia (UAH)', value: 'UAH', symbol: '₴' },
         { label: 'Polish Złoty (PLN)', value: 'PLN', symbol: 'zł' },
     ];
+ export const expenseTypes = [
+        { label: "Individual", value: "individual" },
+        { label: "Shared", value: "shared" },
+        { label: "Sponsored", value: "sponsored" },
+    ];

@@ -68,7 +68,7 @@ const Dropdown = ({
           enabled={!disabled}
           style={[
             { ...(Platform.OS === 'android' ? { height: 50 } : { height: 80, marginBottom: 40 }),
-              color: disabled ? '#999' : '#000'
+              color: disabled ? '#999' : '#000', fontFamily: 'Quicksand-Bold'
             }, 
           ]}
         >
@@ -87,6 +87,7 @@ const Dropdown = ({
               key={item.value}
               label={item.label} 
               value={item.value}
+              style={{ fontFamily: 'Quicksand-Regular' }}
             />
           ))}
         </Picker>

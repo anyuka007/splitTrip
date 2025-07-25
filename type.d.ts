@@ -106,6 +106,8 @@ export interface UpdateTripData {
 
 export type Currency = "EUR" | "USD" | "UAH" | "PLN";
 
+export type ExpenseType = "individual" | "shared" | "sponsored";
+
 export interface TripFormData {
     name: string;
     startDate: Date;
