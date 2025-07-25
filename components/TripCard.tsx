@@ -28,7 +28,8 @@ const TripCard = ({ trip }: TripCardParams) => {
                 onPress={() => router.push(`/trip/${trip.$id}`)}
             >
                 <View>
-                    <Text className="h2">
+                    <Text className="h2" numberOfLines={1} 
+    ellipsizeMode="tail">
                         {trip.name}
                     </Text>
                     <Text className="text-regular text-xs">

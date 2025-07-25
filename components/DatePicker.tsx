@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Button, Text, Platform, Pressable } from 'react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent, DatePickerOptions } from '@react-native-community/datetimepicker';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { formatDateForDisplay } from '@/utils/helpers';
 

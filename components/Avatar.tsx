@@ -9,7 +9,7 @@ const Avatar = ({ name }: AvatarProps) => {
   const randomColor = useMemo(() => {
     const i = Math.floor(Math.random() * avatarColors.length);
     return avatarColors[i];
-  }, [])
+  }, []);
 
   return (
     <View
@@ -17,7 +17,7 @@ const Avatar = ({ name }: AvatarProps) => {
       >
       <Text className="h3 font-bold" style={{ color: randomColor }}>{initials}</Text>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({})

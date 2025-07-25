@@ -2,11 +2,12 @@ import { CustomButtonProps } from '@/type';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const CustomButton = ({ text = "Click Me", onPress, classname, disabled=false, isLoading=false }: CustomButtonProps) => {
+const DEFAULT_BUTTON_LABEL = "Click Me";
+const DEFAULT_BUTTON_CLASSNAME = "bg-primary w-full h-12 flex items-center justify-center rounded-xl my-2";
 
-    const defaultClassName = "bg-primary w-full h-12 flex items-center justify-center rounded-xl my-2";
+const CustomButton = ({ text = DEFAULT_BUTTON_LABEL, onPress, classname, disabled=false, isLoading=false }: CustomButtonProps) => {
 
-    const buttonClassName = classname || defaultClassName;
+    const buttonClassName = classname || DEFAULT_BUTTON_CLASSNAME;
 
     return (
          <TouchableOpacity 

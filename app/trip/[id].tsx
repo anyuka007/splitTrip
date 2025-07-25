@@ -2,7 +2,7 @@
 import useTripsStore from '@/store/trips.store';
 import { Link, router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState, useRef } from 'react';
-import { Pressable, Text, TextInput, View, Alert } from 'react-native';
+import { Pressable, Text, TextInput, View, Alert, ScrollView } from 'react-native';
 import { formatDateForDisplay } from '@/utils/helpers';
 import { Expense, UpdateTripData } from '@/type';
 import { updateTrip } from '@/lib/trips';
@@ -14,7 +14,7 @@ import ExpenseItem from '@/components/ExpenseItem';
 
 const TripDetails = () => {
     const { id } = useLocalSearchParams();
-    const { trips, editTrip, fetchExpenses, getExpensesForTrip } = useTripsStore();
+    const { trips, editTrip, fetchExpenses, getExpensesForTrip, expensesLoading } = useTripsStore();
 
     // Handle id type properly
     const tripId = Array.isArray(id) ? id[0] : id;
@@ -31,10 +31,10 @@ const TripDetails = () => {
     const expenseList = getExpensesForTrip(tripId!); // Use the store's selector to get expenses for this trip
 
 useEffect(() => {
-        if (tripId) {
+        if (tripId && expenseList.length === 0 && !expensesLoading) {
             fetchExpenses(tripId); // ✅ Rufen Sie fetchExpenses auf!
         }
-    }, [tripId, fetchExpenses]);
+    }, [tripId]);
 
 
 
@@ -120,7 +120,7 @@ useEffect(() => {
     }
 
     return (
-        <View className="flex h-full items-center  px-4">
+        <ScrollView style={{ flex: 1, height: '100%', paddingHorizontal: 16 }}>
             <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full '>
             <Pressable onPress={handleDoubleTap} className="mb-4">
                 {isEditingField ? (
@@ -139,25 +139,28 @@ useEffect(() => {
                         />
                     </View>
                 ) : (
-                    <View className="items-center">
-                        <Text className="h1 text-center">{trip.name}</Text>
+                    <View className="flex-row justify-between items-center">
+                        <Text className="h1 w-[85%]" numberOfLines={2} ellipsizeMode="tail">{trip.name}</Text><Pressable className="p-2 flex items-end justify-center" onPress={() => router.push(`/trip/edit/${tripId}`)}>
+                <FontAwesome name="edit" size={24} color="#f6c445" />
+            </Pressable>
                     </View>
                 )}
             </Pressable>
-            <Pressable className="bg-tertiary rounded-full p-2" onPress={() => router.push(`/trip/edit/${tripId}`)}>
-                        <FontAwesome name="edit" size={24} color="white" />
-                      </Pressable>
-            <Text className="text-regular text-center">
+            <View className='flex flex-row justify-between'>
+                <Text className='text-regular text-sm'>Duration:</Text>
+                <Text className="text-regular text-center">
                 {`${formatDateForDisplay(trip.dateStart)} - ${formatDateForDisplay(trip.dateEnd)}`}
             </Text>
+            </View>
+            
             <View className='flex flex-row justify-between'>
-                <Text>Currency:</Text>
-                <Text>{trip.defaultCurrency}</Text>
+                <Text className='text-regular text-sm'>Currency:</Text>
+                <Text className='text-regular'>{trip.defaultCurrency}</Text>
             </View>
             <View className='flex flex-row justify-between'>
-                <Text>Participants: </Text>
+                <Text className='text-regular text-sm'>Participants: </Text>
                 <View className='flex flex-row gap-2'>
-                    <Text>{trip?.participants.map(participant => participant.name).join(', ')}</Text>
+                    <Text className='text-regular'>{trip?.participants.map(participant => participant.name).join(', ')}</Text>
                 </View>
             </View>
         </View>
@@ -177,7 +180,7 @@ useEffect(() => {
             )} 
             <CustomButton text='Add Expense' onPress={() => router.push(`/trip/${tripId}/expense/create`)} />     
         </View>
-    </View>
+    </ScrollView>
     );
 }
 
