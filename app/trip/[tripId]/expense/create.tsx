@@ -4,14 +4,15 @@ import DatePicker from '@/components/DatePicker';
 import Dropdown from '@/components/Dropdown';
 import { createExpense } from '@/lib/expenses';
 import useTripsStore from '@/store/trips.store';
-import { Currency, Expense, ExpenseType } from '@/type';
+import { Currency, Expense, ExpenseType, Participant } from '@/type';
 import { formatDateForDisplay } from '@/utils/helpers';
 import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, } from 'react-native';
 import CheckBox, { Checkbox } from 'expo-checkbox';
+import CustomCheckbox from '@/components/CustomCheckbox';
 //import CheckBox from 'expo-checkbox';
 
 interface CreateExpenseProps {
@@ -40,7 +41,38 @@ const CreateExpense = () => {
 
   const [expense, setExpense] = useState<ExpenseLike>({ description: "", amount: 0, currency: trip?.defaultCurrency || "EUR", date: new Date(), type: "individual", tripId: tripId as string, payerId: "" });
   
-  const [toggleCheckBox, setToggleCheckBox] = useState(false);
+  const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
+
+  // Participant selection toggle function
+  const toggleParticipant = (participantId: string) => {
+    setSelectedParticipants(prev => {
+      if (prev.includes(participantId)) {
+        // Remove if already selected
+        return prev.filter(id => id !== participantId);
+      } else {
+        // Add if not selected
+        return [...prev, participantId];
+      }
+    });
+  };
+
+  // Select all participants
+  const toggleAllParticipants = () => {
+    if (selectedParticipants.length === trip?.participants.length) {
+      // Deselect all
+      setSelectedParticipants([]);
+    } else {
+      // Select all
+      setSelectedParticipants(trip?.participants.map(p => p.$id) || []);
+    }
+  };
+
+  // Add payer to selected participants if not already included
+  useEffect(() => {
+    if (expense.payerId && !selectedParticipants.includes(expense.payerId)) {
+      setSelectedParticipants(prev => [...prev, expense.payerId]);
+    }
+  }, [expense.payerId]);
 
   const expenseData: ExpenseLike = {
     description: 'New Expense',
@@ -117,16 +149,50 @@ const CreateExpense = () => {
               onValueChange={(type) => setExpense({ ...expense, type: type as ExpenseType })}
               pickerStyle={{ height: 60 }}
             />
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }}>
-              <Checkbox
-                value={toggleCheckBox}
-                onValueChange={setToggleCheckBox}
-                color={toggleCheckBox ? '#4630EB' : undefined}
+            <View className='flex'>
+            <Text className='label'>
+              Select participants who should pay for this expense
+            </Text>
+
+            {/* Select All/None Button */}
+            <View style={{ marginBottom: 8 }}>
+              <CustomCheckbox
+                isChecked={selectedParticipants.length === trip.participants.length}
+                onToggle={toggleAllParticipants}
+                label={`Select All (${selectedParticipants.length}/${trip.participants.length})`}
+                color="#007bff"
               />
-              <Text style={{ marginLeft: 8 }}>
-                Split equally among participants
-              </Text>
             </View>
+
+            
+           {/* Individual Participant Checkboxes */}
+            {trip.participants.map((participant: Participant) => (
+              <View key={participant.$id} className='flex flex-row justify-between items-center'>
+                <CustomCheckbox
+                
+                isChecked={selectedParticipants.includes(participant.$id)}
+                onToggle={() => toggleParticipant(participant.$id)}
+                label={`${participant.name}${participant.$id === expense.payerId ? ' (Payer)' : ''}`}
+                color={participant.$id === expense.payerId ? '#28a745' : '#f6c445'}
+                disabled={participant.$id === expense.payerId} // Payer kann nicht abgewählt werden
+              />
+              {expense.amount && selectedParticipants.length > 0 && (
+                <Text>
+                  {Number((expense.amount / selectedParticipants.length).toFixed(2))}
+                  {expense.currency}
+                </Text>
+              )}
+            </View>
+          ))}
+
+            {/* Error message if no participants selected */}
+
+            {selectedParticipants.length === 0 && (
+              <Text className='text-tertiary text-regulartext-sm mt-2'>
+                Please select at least one participant
+              </Text>
+            )}
+          </View>
           </View>
           <CustomButton text="Create Expense" onPress={() => createExpenseHandler(expenseData)} />
         </>
