@@ -1,4 +1,5 @@
 import CustomButton from '@/components/CustomButton';
+import CustomCheckbox from '@/components/CustomCheckbox';
 import CustomInput from '@/components/CustomInput';
 import DatePicker from '@/components/DatePicker';
 import Dropdown from '@/components/Dropdown';
@@ -9,10 +10,8 @@ import { formatDateForDisplay } from '@/utils/helpers';
 import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, } from 'react-native';
-import CheckBox, { Checkbox } from 'expo-checkbox';
-import CustomCheckbox from '@/components/CustomCheckbox';
 //import CheckBox from 'expo-checkbox';
 
 interface CreateExpenseProps {
@@ -107,8 +106,8 @@ const CreateExpense = () => {
         <>
           <Text className='text-regular'>Trip Name: {trip.name}</Text>
           <Text className='text-regular'>Trip Date: {formatDateForDisplay(trip.dateStart)} - {formatDateForDisplay(trip.dateEnd)}</Text>
-          
-          
+
+
           <CustomInput
             placeholder="Enter expense description"
             label='Expense Description'
@@ -159,6 +158,7 @@ const CreateExpense = () => {
 
           <View className='flex'>
             <Text className='label'>Type of expense</Text>
+
             <Dropdown
               items={expenseTypes}
               selectedValue={expense.type}
@@ -168,94 +168,87 @@ const CreateExpense = () => {
 
 
             <View className='flex'>
-      {expense.type === "individual" ? (
-        <Text className='label'>Individual Expense</Text>
-      ) : (
-        <>
-          <Text className='label'>
-            Select participants who should pay for this expense
-          </Text>
+              {expense.type === "individual" ? (
+                <Text className='label'>Individual Expense</Text>
+              ) : (
+                <>
+                  <Text className='label'>
+                    Select participants who should pay for this expense
+                  </Text>
 
-          {/* Select All/None Button */}
-          <View style={{ marginBottom: 8 }}>
-            <CustomCheckbox
-              isChecked={selectedParticipants.length === trip.participants.length }
-              onToggle={toggleAllParticipants}
-              label={`Select All`}
-              color="#007bff"
-            />
+                  {/* Select All/None Button */}
+                  <View style={{ marginBottom: 8 }}>
+                    <CustomCheckbox
+                      isChecked={selectedParticipants.length === trip.participants.length}
+                      onToggle={toggleAllParticipants}
+                      label="Select all"
+                      color="#007bff"
+                    />
+                  </View>
+
+                  {/* Individual Participant Checkboxes */}
+                  {expense.type === "shared" && (
+                    <>
+                      {trip.participants.map((participant: Participant) => (
+                        <View key={participant.$id} className='flex flex-row justify-between items-center'>
+                          <CustomCheckbox
+                            isChecked={selectedParticipants.includes(participant.$id)}
+                            onToggle={() => toggleParticipant(participant.$id)}
+                            label={`${participant.name}${participant.$id === expense.payerId ? ' (Payer)' : ''}`}
+                            color={participant.$id === expense.payerId ? '#28a745' : '#f6c445'}
+                            disabled={participant.$id === expense.payerId}
+                          />
+                          {!!expense.amount && selectedParticipants.length > 0 && selectedParticipants.includes(participant.$id) && (
+                            <Text>
+                              {Number((expense.amount / selectedParticipants.length).toFixed(2))} {expense.currency}
+                            </Text>
+                          )}
+                        </View>
+                      ))}
+                    </>
+                  )}
+
+                  {expense.type === "sponsored" && (
+                    <>
+                      {trip.participants.map((participant: Participant) => {
+                        const isPayer = participant.$id === expense.payerId;
+                        const isSelected = selectedParticipants.includes(participant.$id);
+
+                        return (
+                          <View key={participant.$id} className='flex flex-row justify-between items-center'>
+                            <CustomCheckbox
+                              isChecked={isSelected} // Payer is always "selected" for sponsored
+                              onToggle={() => !isPayer && toggleParticipant(participant.$id)}
+                              label={`${participant.name}${isPayer ? ' (Sponsor)' : ''}`}
+                              color={isPayer ? '#28a745' : '#f6c445'}
+                              disabled={isPayer} // Sponsor can't be unchecked
+                            />
+                            {!!expense.amount && (isPayer || isSelected) &&
+                              <Text>
+                                {isPayer
+                                  ? `Pays: ${expense.amount} ${expense.currency}`
+                                  : `${Number((expense.amount / (selectedParticipants.length - 1)).toFixed(2))} ${expense.currency}`
+                                }
+                              </Text>
+                            }
+                          </View>
+                        );
+                      })}
+                    </>
+                    
+                  )}
+                  {/* Error message if no participants selected */}
+                      {selectedParticipants.length < 2 && (
+                        <Text className='text-tertiary text-regular text-sm mt-2'>
+                          Please select at least one participant
+                        </Text>
+                      )}
+                </>
+              )}
+            </View>
           </View>
 
-{/* Individual Participant Checkboxes */}
-{expense.type === "shared" && (
-  <>
-    {trip.participants.map((participant: Participant) => (
-      <View key={participant.$id} className='flex flex-row justify-between items-center'>
-        <CustomCheckbox
-          isChecked={selectedParticipants.includes(participant.$id)}
-          onToggle={() => toggleParticipant(participant.$id)}
-          label={`${participant.name}${participant.$id === expense.payerId ? ' (Payer)' : ''}`}
-          color={participant.$id === expense.payerId ? '#28a745' : '#f6c445'}
-          disabled={participant.$id === expense.payerId}
-        />
-        {expense.amount && selectedParticipants.length > 0 && selectedParticipants.includes(participant.$id) && (
-          <Text>
-            {Number((expense.amount / selectedParticipants.length).toFixed(2))} {expense.currency}
-          </Text>
-        )}
-      </View>
-    ))}
-    {/* Error message if no participants selected */}
-    {selectedParticipants.length < 2 && (
-      <Text className='text-tertiary text-regular text-sm mt-2'>
-        Please select at least one participant
-      </Text>
-    )}
-  </>
-)}
 
-{expense.type === "sponsored" && (
-  <>
-    {trip.participants.map((participant: Participant) => {
-      const isPayer = participant.$id === expense.payerId;
-      const isSelected = selectedParticipants.includes(participant.$id);
-
-      return (
-        <View key={participant.$id} className='flex flex-row justify-between items-center'>
-          <CustomCheckbox
-            isChecked={isPayer || isSelected} // Payer is always "selected" for sponsored
-            onToggle={() => !isPayer && toggleParticipant(participant.$id)}
-            label={`${participant.name}${isPayer ? ' (Sponsor)' : ''}`}
-            color={isPayer ? '#28a745' : '#f6c445'}
-            disabled={isPayer} // Sponsor can't be unchecked
-          />
-          {expense.amount && (isPayer || isSelected) && (
-            <Text>
-              {isPayer
-                ? `Pays: ${expense.amount} ${expense.currency}`
-                : `${Number((expense.amount / (selectedParticipants.length - 1)).toFixed(2))} ${expense.currency}`
-              }
-            </Text>
-          )}
-        </View>
-      );
-    })}
-    {/* Error message if no participants selected */}
-    {selectedParticipants.length < 2 && (
-      <Text className='text-tertiary text-regular text-sm mt-2'>
-        Please select at least one participant
-      </Text>
-    )}
-  </>
-)}
-         
-          
-        </>
-      )}
-
-            
-          </View>
-          </View>
           <CustomButton text="Create Expense" onPress={() => createExpenseHandler(expenseData)} />
         </>
       )}
