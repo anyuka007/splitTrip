@@ -87,7 +87,7 @@ const CreateExpense = () => {
       setShares(shares);
       console.log("shares", JSON.stringify(shares, null, 2));
     } else if (expense.type === "sponsored") {
-      const allShares = selectedParticipants.map(p => ({ participantId: p, share: Number(expense.amount / (selectedParticipants.length - 1)) })) || []
+      const allShares = selectedParticipants.map(p => ({ participantId: p, share: Number((expense.amount / (selectedParticipants.length - 1)).toFixed(2)) })) || []
       const sponsoredShares = allShares.filter(s => s.participantId !== expense.payerId);
       setShares(sponsoredShares);
     }
