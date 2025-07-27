@@ -9,7 +9,6 @@ import { Currency, Expense, ExpenseType, Participant } from '@/type';
 import { formatDateForDisplay } from '@/utils/helpers';
 import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
-import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, } from 'react-native';
 //import CheckBox from 'expo-checkbox';
@@ -33,6 +32,11 @@ export interface ExpenseData {
   payerId: string;
 }
 
+interface Share {
+  participantId: string;
+  share: number;
+}
+
 const CreateExpense = () => {
   const { tripId } = useLocalSearchParams();
   const { trips } = useTripsStore();
@@ -43,6 +47,21 @@ const CreateExpense = () => {
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
     trip?.participants.map(p => p.$id) || []
   );
+
+  const [shares, setShares] = useState<Share[]>([{ participantId: expense.payerId, share: expense.amount }]);
+
+  const updateShares = (participantId: string, share: number) => {
+    if (expense.type === "individual") {
+      if (participantId === expense.payerId) {
+         setShares([{ participantId, share }]);
+      }
+    }
+
+  };
+
+  useEffect(() => {
+    updateShares(expense.payerId, expense.amount);
+  }, [expense.amount]);
 
   // Participant selection toggle function
   const toggleParticipant = (participantId: string) => {
@@ -169,7 +188,7 @@ const CreateExpense = () => {
 
             <View className='flex'>
               {expense.type === "individual" ? (
-                <Text className='label'>Individual Expense</Text>
+                <Text className='label'>{shares[0].share}</Text>
               ) : (
                 <>
                   <Text className='label'>
