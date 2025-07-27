@@ -50,18 +50,48 @@ const CreateExpense = () => {
 
   const [shares, setShares] = useState<Share[]>([{ participantId: expense.payerId, share: expense.amount }]);
 
-  const updateShares = (participantId: string, share: number) => {
+  /* const updateShare = (participantId: string, share: number) => {
     if (expense.type === "individual") {
       if (participantId === expense.payerId) {
          setShares([{ participantId, share }]);
       }
+    } else if (expense.type === "shared") {
+      setShares(prevShares => {
+        const existingShare = prevShares.find(s => s.participantId === participantId);
+        if (existingShare) {
+          return prevShares.map(s => s.participantId === participantId ? { ...s, share } : s);
+        } else {
+          return [...prevShares, { participantId, share }];
+        }
+      });
     }
 
+  }; */
+
+  const updateShare = (participantId: string, share: number) => {
+    setShares(prevShares => {
+      const existingShare = prevShares.find(s => s.participantId === participantId);
+      if (existingShare) {
+        return prevShares.map(s => s.participantId === participantId ? { ...s, share } : s);
+      } else {
+        return [...prevShares, { participantId, share }];
+      }
+    });
   };
 
   useEffect(() => {
-    updateShares(expense.payerId, expense.amount);
-  }, [expense.amount]);
+    if (expense.type === "individual") {
+      setShares([{ participantId: expense.payerId, share: expense.amount }]);
+    } else if (expense.type === "shared" && expense.amount && selectedParticipants.length > 0) {
+      const shares = selectedParticipants.map(p => ({ participantId: p, share: Number((expense.amount / selectedParticipants.length).toFixed(2)) })) || []
+      setShares(shares);
+      console.log("shares", JSON.stringify(shares, null, 2));
+    } else if (expense.type === "sponsored") {
+      const allShares = selectedParticipants.map(p => ({ participantId: p, share: Number(expense.amount / (selectedParticipants.length - 1)) })) || []
+      const sponsoredShares = allShares.filter(s => s.participantId !== expense.payerId);
+      setShares(sponsoredShares);
+    }
+  }, [expense.type, expense.amount, selectedParticipants]);
 
   // Participant selection toggle function
   const toggleParticipant = (participantId: string) => {
@@ -82,7 +112,7 @@ const CreateExpense = () => {
       // Deselect all
       setSelectedParticipants([expense.payerId]);
       console.log("selectedParticipants:", selectedParticipants); // Ensure payer is always included
-      console.log("payer.id:", expense.payerId); // Ensure payer is always included
+      
     } else {
       // Select all
       setSelectedParticipants(trip?.participants.map(p => p.$id) || []);
@@ -214,12 +244,13 @@ const CreateExpense = () => {
                             isChecked={selectedParticipants.includes(participant.$id)}
                             onToggle={() => toggleParticipant(participant.$id)}
                             label={`${participant.name}${participant.$id === expense.payerId ? ' (Payer)' : ''}`}
-                            color={participant.$id === expense.payerId ? '#28a745' : '#f6c445'}
+                            color={participant.$id === expense.payerId ? '#28a745' : '#f6c445'} 
                             disabled={participant.$id === expense.payerId}
                           />
                           {!!expense.amount && selectedParticipants.length > 0 && selectedParticipants.includes(participant.$id) && (
                             <Text>
-                              {Number((expense.amount / selectedParticipants.length).toFixed(2))} {expense.currency}
+                              {/* {Number((expense.amount / selectedParticipants.length).toFixed(2))} {expense.currency} */}
+                              {shares.find(s => s.participantId === participant.$id)?.share || 0} {expense.currency}
                             </Text>
                           )}
                         </View>
@@ -246,7 +277,7 @@ const CreateExpense = () => {
                               <Text>
                                 {isPayer
                                   ? `Pays: ${expense.amount} ${expense.currency}`
-                                  : `${Number((expense.amount / (selectedParticipants.length - 1)).toFixed(2))} ${expense.currency}`
+                                  : `${shares.find(s => s.participantId === participant.$id)?.share || 0} ${expense.currency}`
                                 }
                               </Text>
                             }
