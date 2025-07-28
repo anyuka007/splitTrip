@@ -131,8 +131,14 @@ const CreateExpense = () => {
     }
   }, [expense.type, expense.amount, selectedParticipants, isEditAmount, hasCustomShares]);
 
+
+  // Reset selected participants when type or amount changes
   useEffect(() => {
-    setSelectedParticipants(trip?.participants.map(p => p.$id) || []);
+    if (expense.type === "individual") {
+    setSelectedParticipants([expense.payerId]);
+  } else {
+    setSelectedParticipants(trip?.participants?.map(p => p.$id) ?? []);
+  }
     setIsEditAmount(false);
   }, [expense.type, expense.amount]);
 
