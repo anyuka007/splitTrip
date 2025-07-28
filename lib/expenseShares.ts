@@ -1,6 +1,6 @@
-import { CreateExpenseShareData, ExpenseShare } from "@/app/trip/[tripId]/expense/create";
 import { ID } from "react-native-appwrite";
 import { appwriteConfig, databases } from "./appwrite";
+import { ExpenseShare, CreateExpenseShareData } from "@/type";
 
 export const createExpenseShare = async (shareData: CreateExpenseShareData): Promise<ExpenseShare> => {
   try {

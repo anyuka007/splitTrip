@@ -38,6 +38,39 @@ export interface Expense extends Models.Document {
     payerId: string; // ID of the participant who paid for the expense
 }
 
+export type ExpenseLike = Pick<Expense, 'description' | 'amount' | 'currency' | 'date' | 'type' | 'conversionRate' | 'convertedAmount' | 'tripId' | 'payerId'>;
+
+export interface ExpenseData {
+  description: string;
+  amount: number;
+  currency: string;
+  date: Date;
+  type: ExpenseType;
+  conversionRate?: number;
+  convertedAmount?: number;
+  tripId: string;
+  payerId: string;
+}
+
+export interface Share {
+  participantId: string;
+  share: number;
+}
+
+export interface ExpenseShare extends Models.Document {
+  tripId: string;
+  expenseId: string;
+  participantId: string;
+  amount: number;
+}
+
+export interface CreateExpenseShareData {
+  tripId: string;
+  expenseId: string;
+  participantId: string;
+  amount: number;
+}
+
 export interface TabBarIconProps {
   name: string;
   title: string;
@@ -127,3 +160,4 @@ export interface CreateParticipantData {
     name: string;
     tripId: string; 
 }
+

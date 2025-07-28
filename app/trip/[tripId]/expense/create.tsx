@@ -5,58 +5,21 @@ import DatePicker from '@/components/DatePicker';
 import Dropdown from '@/components/Dropdown';
 import { createExpense } from '@/lib/expenses';
 import useTripsStore from '@/store/trips.store';
-import { Currency, Expense, ExpenseType, Participant } from '@/type';
+import { CreateExpenseShareData, Currency, Expense, ExpenseData, ExpenseLike, ExpenseType, Participant, Share } from '@/type';
 import { formatDateForDisplay } from '@/utils/helpers';
 import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
-import { use, useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View, } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, StyleSheet, Text, TextInput, View, } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Models } from 'react-native-appwrite';
 import { createExpenseShare } from '@/lib/expenseShares';
-//import CheckBox from 'expo-checkbox';
 
-interface CreateExpenseProps {
-  tripId: string;
 
-}
 
-export type ExpenseLike = Pick<Expense, 'description' | 'amount' | 'currency' | 'date' | 'type' | 'conversionRate' | 'convertedAmount' | 'tripId' | 'payerId'>;
-
-export interface ExpenseData {
-  description: string;
-  amount: number;
-  currency: string;
-  date: Date;
-  type: ExpenseType;
-  conversionRate?: number;
-  convertedAmount?: number;
-  tripId: string;
-  payerId: string;
-}
-
-export interface Share {
-  participantId: string;
-  share: number;
-}
-
-export interface ExpenseShare extends Models.Document {
-  tripId: string;
-  expenseId: string;
-  participantId: string;
-  amount: number;
-}
-
-export interface CreateExpenseShareData {
-  tripId: string;
-  expenseId: string;
-  participantId: string;
-  amount: number;
-}
 
 const CreateExpense = () => {
   const { tripId } = useLocalSearchParams();
-  const { trips } = useTripsStore();
+  const { trips, fetchExpenses } = useTripsStore();
   const trip = trips.find(t => t.$id === tripId);
 
   const [expense, setExpense] = useState<ExpenseLike>({ description: "", amount: 0, currency: trip?.defaultCurrency || "EUR", date: new Date(), type: "individual", tripId: tripId as string, payerId: trip?.participants[0].$id || "" });
@@ -213,62 +176,60 @@ const CreateExpense = () => {
     }
   }, [expense.payerId]);
 
-  const expenseData: ExpenseLike = {
-    description: 'New Expense',
-    amount: 2000,
-    // currency: trip?.defaultCurrency || 'EUR',
-    currency: 'USD', // Fixed: no more empty string
-    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    type: "shared",
-    tripId: tripId as string,
-    payerId: "68823df400278fc17ad6"
-  };
 
-  const createExpenseHandler = async (expenseData: ExpenseLike): Promise<Expense> => {
-  if (!expense.description.trim()) {
+  // =================================================================
+  // CREATE EXPENSE HANDLER
+  // =================================================================
+  const createExpenseHandler = async (expenseData: ExpenseData): Promise<void> => {
+  
+  // Early return for validation
+    if (!expense.description.trim()) {
     Alert.alert("Missing description", "Please enter a description.");
-    return Promise.reject(new Error("Missing description"));
+    return; // ✅ Früh beenden, nichts zurückgeben
   }
   if (expense.amount <= 0) {
     Alert.alert("Invalid amount", "Please enter a valid amount.");
-    return Promise.reject(new Error("Invalid amount"));
+    return; // ✅ Früh beenden
   }
   
+  // Create expense object
   try {
     const newExpense = await createExpense(expenseData);
     const expenseId = newExpense.$id;
     
-    // Create shares using the input data type
+    // Create shares
     const expenseSharesData: CreateExpenseShareData[] = 
-    
-    expense.type === "individual" ? 
-    [{ tripId: tripId as string, expenseId, participantId: expense.payerId, amount: expense.amount }] :
-    expense.type === "shared" ? 
+    expense.type === "individual" 
+    ? [{ tripId: tripId as string, expenseId, participantId: expense.payerId, amount: expense.amount }] 
+    : expense.type === "shared" ? 
     selectedParticipants.map(participantId => ({
       tripId: tripId as string,
-      expenseId,
+      expenseId: expenseId,
       participantId,
       amount: getShareValue(participantId)
-    })) :
-
-    selectedParticipants.filter(p => p !== expense.payerId).map(participantId => ({
+    })) 
+    // Sponsored expenses
+    :selectedParticipants.filter(p => p !== expense.payerId).map(participantId => ({
       tripId: tripId as string,
       expenseId,
       participantId,
       amount: getShareValue(participantId)
     }));  
     
-    // Save shares to the database (createExpenseShare returns ExpenseShare documents)
-    const createdShares: ExpenseShare[] = await Promise.all(
+    // Save all shares to database
+    await Promise.all(
       expenseSharesData.map(shareData => createExpenseShare(shareData))
     );
     
-    router.push(`/trip/${tripId}/expense/${expenseId}`);
-    return newExpense;
+    // Update store
+    await fetchExpenses(tripId as string);
+
+    // Navigate back
+    router.push(`/trip/${trip!.$id}`);
+    
   } catch (error) {
     console.error("Error creating expense:", error);
     Alert.alert("Error", "Failed to create expense");
-    throw error; // Better than Promise.reject()
   }
 };
 
@@ -278,7 +239,7 @@ const CreateExpense = () => {
       contentContainerStyle={{ padding: 20, gap: 16 }}
       enableOnAndroid={true}
       enableAutomaticScroll={true}
-      extraHeight={150} // ✅ Extra Platz über der Tastatur
+      extraHeight={150}
       keyboardShouldPersistTaps="handled"
     >
       <Text className='text-regular'>CreateExpense</Text>
