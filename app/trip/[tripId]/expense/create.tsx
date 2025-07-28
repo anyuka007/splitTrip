@@ -10,7 +10,7 @@ import { formatDateForDisplay } from '@/utils/helpers';
 import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, View, } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, TextInput, View, } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { createExpenseShare } from '@/lib/expenseShares';
 
@@ -241,7 +241,7 @@ const CreateExpense = () => {
 
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1, backgroundColor: 'white' }}
+      style={{ flex: 1, backgroundColor: 'white', marginBottom: Platform.OS === 'ios' ? 0 : 50 }}
       contentContainerStyle={{ padding: 20, gap: 16 }}
       enableOnAndroid={true}
       enableAutomaticScroll={true}
