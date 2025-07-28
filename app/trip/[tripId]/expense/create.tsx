@@ -10,7 +10,8 @@ import { formatDateForDisplay } from '@/utils/helpers';
 import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, View, } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 //import CheckBox from 'expo-checkbox';
 
 interface CreateExpenseProps {
@@ -47,29 +48,15 @@ const CreateExpense = () => {
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
     trip?.participants.map(p => p.$id) || []
   );
-
+  const [amountInput, setAmountInput] = useState('');
   const [shares, setShares] = useState<Share[]>([{ participantId: expense.payerId, share: expense.amount }]);
 
-  /* const updateShare = (participantId: string, share: number) => {
-    if (expense.type === "individual") {
-      if (participantId === expense.payerId) {
-         setShares([{ participantId, share }]);
-      }
-    } else if (expense.type === "shared") {
-      setShares(prevShares => {
-        const existingShare = prevShares.find(s => s.participantId === participantId);
-        if (existingShare) {
-          return prevShares.map(s => s.participantId === participantId ? { ...s, share } : s);
-        } else {
-          return [...prevShares, { participantId, share }];
-        }
-      });
-    }
+  const [isEditAmount, setIsEditAmount] = useState(false);
+  const [tempShares, setTempShares] = useState<Share[]>(shares);
+  const [shareInputs, setShareInputs] = useState<Record<string, string>>({});
 
-  }; */
-
-  const updateShare = (participantId: string, share: number) => {
-    setShares(prevShares => {
+  const updateTempShare = (participantId: string, share: number) => {
+    setTempShares(prevShares => {
       const existingShare = prevShares.find(s => s.participantId === participantId);
       if (existingShare) {
         return prevShares.map(s => s.participantId === participantId ? { ...s, share } : s);
@@ -79,7 +66,58 @@ const CreateExpense = () => {
     });
   };
 
+  const startEditMode = () => {
+    setTempShares([...shares]);
+    setShareInputs(
+      shares.reduce((acc, s) => {
+        acc[s.participantId] = s.share.toString();
+        return acc;
+      }, {} as Record<string, string>)
+    );
+    setIsEditAmount(true);
+  };
+
+  const saveShares = () => {
+    // NaN-Check and sum validation
+    const validShares = tempShares.filter(s => !isNaN(s.share));
+    const sum = validShares.reduce((acc, s) => acc + s.share, 0);
+
+
+    if (Math.abs(sum - expense.amount) > 0.01) {
+      Alert.alert(
+        "Invalid Shares",
+        `Total shares (${sum.toFixed(2)}) don't match expense amount (${expense.amount.toFixed(2)})`
+      );
+      return;
+    }
+
+    setShares([...tempShares]);
+    setIsEditAmount(false);
+  };
+
+  const cancelEditingShares = () => {
+    setTempShares([...shares]);
+    setShareInputs({});
+    setIsEditAmount(false);
+  };
+
+  const getShareValue = (participantId: string): number => {
+    if (isEditAmount) {
+      const tempShare = tempShares.find(s => s.participantId === participantId)?.share;
+      if (tempShare !== undefined) {
+        return tempShare;
+      }
+
+      const regularShare = shares.find(s => s.participantId === participantId)?.share;
+      return regularShare || 0;
+    }
+
+    return shares.find(s => s.participantId === participantId)?.share || 0;
+  };
+
   useEffect(() => {
+    if (isEditAmount) return; // Skip if in edit mode
+
     if (expense.type === "individual") {
       setShares([{ participantId: expense.payerId, share: expense.amount }]);
     } else if (expense.type === "shared" && expense.amount && selectedParticipants.length > 0) {
@@ -91,7 +129,7 @@ const CreateExpense = () => {
       const sponsoredShares = allShares.filter(s => s.participantId !== expense.payerId);
       setShares(sponsoredShares);
     }
-  }, [expense.type, expense.amount, selectedParticipants]);
+  }, [expense.type, expense.amount, selectedParticipants, isEditAmount]);
 
   // Participant selection toggle function
   const toggleParticipant = (participantId: string) => {
@@ -112,7 +150,7 @@ const CreateExpense = () => {
       // Deselect all
       setSelectedParticipants([expense.payerId]);
       console.log("selectedParticipants:", selectedParticipants); // Ensure payer is always included
-      
+
     } else {
       // Select all
       setSelectedParticipants(trip?.participants.map(p => p.$id) || []);
@@ -121,6 +159,7 @@ const CreateExpense = () => {
 
   // Add payer to selected participants if not already included
   useEffect(() => {
+
     if (expense.payerId && !selectedParticipants.includes(expense.payerId)) {
       setSelectedParticipants(prev => [...prev, expense.payerId]);
     }
@@ -138,10 +177,19 @@ const CreateExpense = () => {
   };
 
   const createExpenseHandler = async (expenseData: ExpenseLike): Promise<Expense> => {
+    if (!expense.description.trim()) {
+      Alert.alert("Missing description", "Please enter a description.");
+      return Promise.reject();
+    }
+    if (expense.amount <= 0) {
+      Alert.alert("Invalid amount", "Please enter a valid amount.");
+      return Promise.reject();
+    }
     try {
-      const expense = await createExpense(expenseData);
+
+      const newExpense = await createExpense(expenseData);
       router.push(`/trip/${tripId}`);
-      return expense;
+      return newExpense;
     } catch (error) {
       console.error("Error creating expense:", error);
       throw error;
@@ -149,7 +197,14 @@ const CreateExpense = () => {
   };
 
   return (
-    <ScrollView className='flex gap-4 bg-white  p-5 mt-3' contentContainerStyle={{ gap: 16 }}>
+    <KeyboardAwareScrollView
+      style={{ flex: 1, backgroundColor: 'white' }}
+      contentContainerStyle={{ padding: 20, gap: 16 }}
+      enableOnAndroid={true}
+      enableAutomaticScroll={true}
+      extraHeight={150} // ✅ Extra Platz über der Tastatur
+      keyboardShouldPersistTaps="handled"
+    >
       <Text className='text-regular'>CreateExpense</Text>
       {trip && (
         <>
@@ -177,8 +232,18 @@ const CreateExpense = () => {
           <CustomInput
             placeholder="Enter expense amount"
             label='Amount'
-            value={expense.amount.toString()}
-            onChangeText={(text) => setExpense({ ...expense, amount: Number(text) })}
+            value={amountInput}
+            onChangeText={(text) => {
+              setAmountInput(text);
+              const parsed = parseFloat(text.replace(',', '.'));
+              if (!isNaN(parsed)) {
+                setExpense({
+                  ...expense,
+                  amount: parsed,
+                });
+              }
+            }}
+            keyboardType="numeric"
           />
 
 
@@ -244,15 +309,28 @@ const CreateExpense = () => {
                             isChecked={selectedParticipants.includes(participant.$id)}
                             onToggle={() => toggleParticipant(participant.$id)}
                             label={`${participant.name}${participant.$id === expense.payerId ? ' (Payer)' : ''}`}
-                            color={participant.$id === expense.payerId ? '#28a745' : '#f6c445'} 
+                            color={participant.$id === expense.payerId ? '#28a745' : '#f6c445'}
                             disabled={participant.$id === expense.payerId}
                           />
                           {!!expense.amount && selectedParticipants.length > 0 && selectedParticipants.includes(participant.$id) && (
-                            <Text>
-                              {/* {Number((expense.amount / selectedParticipants.length).toFixed(2))} {expense.currency} */}
-                              {shares.find(s => s.participantId === participant.$id)?.share || 0} {expense.currency}
-                            </Text>
+                            !isEditAmount ? (
+                              <Text>
+                                {getShareValue(participant.$id)} {expense.currency}
+                              </Text>
+                            ) : (
+                              <CustomInput
+                                placeholder="Enter share amount"
+                                value={shareInputs[participant.$id] ?? getShareValue(participant.$id).toString()}
+                                onChangeText={(text) => {
+                                  setShareInputs(prev => ({ ...prev, [participant.$id]: text }));
+                                  const parsed = parseFloat(text.replace(',', '.'));
+                                  updateTempShare(participant.$id, isNaN(parsed) ? 0 : parsed);
+                                }}
+                                keyboardType='numeric'
+                              />
+                            )
                           )}
+
                         </View>
                       ))}
                     </>
@@ -273,36 +351,64 @@ const CreateExpense = () => {
                               color={isPayer ? '#28a745' : '#f6c445'}
                               disabled={isPayer} // Sponsor can't be unchecked
                             />
-                            {!!expense.amount && (isPayer || isSelected) &&
-                              <Text>
-                                {isPayer
-                                  ? `Pays: ${expense.amount} ${expense.currency}`
-                                  : `${shares.find(s => s.participantId === participant.$id)?.share || 0} ${expense.currency}`
-                                }
-                              </Text>
-                            }
+                            {!!expense.amount && (isPayer || isSelected) && (
+                              isEditAmount && !isPayer ? (
+                                <TextInput
+                                  placeholder="Enter share amount"
+                                  value={shareInputs[participant.$id] ?? getShareValue(participant.$id).toString()}
+                                  onChangeText={(text) => {
+                                    setShareInputs(prev => ({ ...prev, [participant.$id]: text }));
+                                    const parsed = parseFloat(text.replace(',', '.'));
+                                    updateTempShare(participant.$id, isNaN(parsed) ? 0 : parsed);
+                                  }}
+                                  keyboardType="numeric"
+                                />
+                              ) : (
+                                <Text>
+                                  {isPayer
+                                    ? `Pays: ${expense.amount} ${expense.currency}`
+                                    : `${shares.find(s => s.participantId === participant.$id)?.share || 0} ${expense.currency}`}
+                                </Text>
+                              )
+                            )}
                           </View>
                         );
                       })}
                     </>
-                    
+
                   )}
                   {/* Error message if no participants selected */}
-                      {selectedParticipants.length < 2 && (
-                        <Text className='text-tertiary text-regular text-sm mt-2'>
-                          Please select at least one participant
-                        </Text>
+                  {selectedParticipants.length < 2 && (
+                    <Text className='text-tertiary text-regular text-sm mt-2'>
+                      Please select at least one participant
+                    </Text>
+                  )}
+                  {!!expense.amount && selectedParticipants.length > 1 && (
+                    <View className='flex items-end'>
+                      {isEditAmount ? (
+                        <View className='flex flex-row justify-between w-full'>
+                          <CustomButton text="Cancel" onPress={cancelEditingShares} classname='w-[45%] h-12 bg-tertiary rounded-xl my-2 flex items-center justify-center' />
+                          <CustomButton text="Save shares" onPress={saveShares} classname='w-[45%] h-12 bg-secondary rounded-xl my-2 flex items-center justify-center' />
+                        </View>
+
+                      ) : (
+                        <CustomButton text="Edit shares" onPress={startEditMode} classname='w-[45%] h-12 bg-secondary rounded-xl my-2 flex items-center justify-center' />
                       )}
+                    </View>
+                  )}
+
                 </>
               )}
+
+
             </View>
           </View>
 
 
-          <CustomButton text="Create Expense" onPress={() => createExpenseHandler(expenseData)} />
+          <CustomButton text="Create Expense" onPress={() => createExpenseHandler(expense)} />
         </>
       )}
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

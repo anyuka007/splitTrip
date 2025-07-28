@@ -1,4 +1,6 @@
+import { Key } from 'react';
 import { Models } from 'react-native-appwrite';
+import { KeyboardTypeOptions } from 'react-native';
 
 export interface User extends Models.Document {
     name: string;
@@ -55,7 +57,8 @@ export interface CustomInputProps {
     value?: string;    
     label?: string;
     secureTextEntry?: boolean;
-    keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";onChangeText?: (text: string) => void;
+    keyboardType?: KeyboardTypeOptions;
+    onChangeText?: (text: string) => void;
 }
 export interface AvatarProps {
   name: string; 
