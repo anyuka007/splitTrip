@@ -13,7 +13,7 @@
 }
 
 .h3 {
-  @apply text-lg font-quicksand-medium;
+  @apply text-lg font-quicksand-semibold;
 }
 
 .h4 {

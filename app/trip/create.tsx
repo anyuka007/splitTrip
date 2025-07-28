@@ -10,8 +10,9 @@ import { formatDateForDB } from '@/utils/helpers';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { currencies } from '@/variables'; 
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const CreateTrip = () => {
 
@@ -127,7 +128,7 @@ const CreateTrip = () => {
     //console.log("Form Data:", formData);
 
     return (
-        <ScrollView className='flex gap-4 bg-white  p-5 mt-3' contentContainerStyle={{ gap: 16 }}>
+        <KeyboardAwareScrollView className='flex gap-4 bg-white  p-5 mt-3' contentContainerStyle={{ gap: 16}} style= {{marginBottom: Platform.OS === 'ios' ? 20 : 50}}>
             <CustomInput
                 placeholder="Enter trip name"
                 value={formData.name}
@@ -217,7 +218,7 @@ const CreateTrip = () => {
                 isLoading={isSubmitting}
                 onPress={submit}
             />
-        </ScrollView>
+        </KeyboardAwareScrollView>
     );
 };
 

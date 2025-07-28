@@ -10,7 +10,7 @@ import { formatDateForDisplay } from '@/utils/helpers';
 import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, Text, TextInput, View, } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { createExpenseShare } from '@/lib/expenseShares';
 
@@ -36,10 +36,14 @@ const CreateExpense = () => {
 
   const [hasCustomShares, setHasCustomShares] = useState(false);
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log("shares", JSON.stringify(shares, null, 2));
     console.log("selectedParticipants", selectedParticipants);
-  }, [shares]);
+  }, [shares]); */
+
+  // ==============================================================
+  // SHARES MANAGEMENT
+  // ==============================================================
 
   const updateTempShare = (participantId: string, share: number) => {
     setTempShares(prevShares => {
@@ -50,7 +54,6 @@ const CreateExpense = () => {
         return [...prevShares, { participantId, share }];
       }
     });
-
   };
 
   const startEditMode = () => {
@@ -68,7 +71,6 @@ const CreateExpense = () => {
     // NaN-Check and sum validation
     const validShares = tempShares.filter(s => !isNaN(s.share));
     const sum = validShares.reduce((acc, s) => acc + s.share, 0);
-
 
     if (Math.abs(sum - expense.amount) > 0.01) {
       Alert.alert(
@@ -135,10 +137,10 @@ const CreateExpense = () => {
   // Reset selected participants when type or amount changes
   useEffect(() => {
     if (expense.type === "individual") {
-    setSelectedParticipants([expense.payerId]);
-  } else {
-    setSelectedParticipants(trip?.participants?.map(p => p.$id) ?? []);
-  }
+      setSelectedParticipants([expense.payerId]);
+    } else {
+      setSelectedParticipants(trip?.participants?.map(p => p.$id) ?? []);
+    }
     setIsEditAmount(false);
   }, [expense.type, expense.amount]);
 
@@ -187,57 +189,57 @@ const CreateExpense = () => {
   // CREATE EXPENSE HANDLER
   // =================================================================
   const createExpenseHandler = async (expenseData: ExpenseData): Promise<void> => {
-  
-  // Early return for validation
-    if (!expense.description.trim()) {
-    Alert.alert("Missing description", "Please enter a description.");
-    return; // ✅ Früh beenden, nichts zurückgeben
-  }
-  if (expense.amount <= 0) {
-    Alert.alert("Invalid amount", "Please enter a valid amount.");
-    return; // ✅ Früh beenden
-  }
-  
-  // Create expense object
-  try {
-    const newExpense = await createExpense(expenseData);
-    const expenseId = newExpense.$id;
-    
-    // Create shares
-    const expenseSharesData: CreateExpenseShareData[] = 
-    expense.type === "individual" 
-    ? [{ tripId: tripId as string, expenseId, participantId: expense.payerId, amount: expense.amount }] 
-    : expense.type === "shared" ? 
-    selectedParticipants.map(participantId => ({
-      tripId: tripId as string,
-      expenseId: expenseId,
-      participantId,
-      amount: getShareValue(participantId)
-    })) 
-    // Sponsored expenses
-    :selectedParticipants.filter(p => p !== expense.payerId).map(participantId => ({
-      tripId: tripId as string,
-      expenseId,
-      participantId,
-      amount: getShareValue(participantId)
-    }));  
-    
-    // Save all shares to database
-    await Promise.all(
-      expenseSharesData.map(shareData => createExpenseShare(shareData))
-    );
-    
-    // Update store
-    await fetchExpenses(tripId as string);
 
-    // Navigate back
-    router.push(`/trip/${trip!.$id}`);
-    
-  } catch (error) {
-    console.error("Error creating expense:", error);
-    Alert.alert("Error", "Failed to create expense");
-  }
-};
+    // Early return for validation
+    if (!expense.description.trim()) {
+      Alert.alert("Missing description", "Please enter a description.");
+      return;
+    }
+    if (expense.amount <= 0) {
+      Alert.alert("Invalid amount", "Please enter a valid amount.");
+      return;
+    }
+
+    // Create expense object
+    try {
+      const newExpense = await createExpense(expenseData);
+      const expenseId = newExpense.$id;
+
+      // Create shares
+      const expenseSharesData: CreateExpenseShareData[] =
+        expense.type === "individual"
+          ? [{ tripId: tripId as string, expenseId, participantId: expense.payerId, amount: expense.amount }]
+          : expense.type === "shared" ?
+            selectedParticipants.map(participantId => ({
+              tripId: tripId as string,
+              expenseId: expenseId,
+              participantId,
+              amount: getShareValue(participantId)
+            }))
+            // Sponsored expenses
+            : selectedParticipants.filter(p => p !== expense.payerId).map(participantId => ({
+              tripId: tripId as string,
+              expenseId,
+              participantId,
+              amount: getShareValue(participantId)
+            }));
+
+      // Save all shares to database
+      await Promise.all(
+        expenseSharesData.map(shareData => createExpenseShare(shareData))
+      );
+
+      // Update store
+      await fetchExpenses(tripId as string);
+
+      // Navigate back
+      router.push(`/trip/${trip!.$id}`);
+
+    } catch (error) {
+      console.error("Error creating expense:", error);
+      Alert.alert("Error", "Failed to create expense");
+    }
+  };
 
   return (
     <KeyboardAwareScrollView
@@ -248,33 +250,39 @@ const CreateExpense = () => {
       extraHeight={150}
       keyboardShouldPersistTaps="handled"
     >
-      <Text className='text-regular'>CreateExpense</Text>
       {trip && (
         <>
-          <Text className='text-regular'>Trip Name: {trip.name}</Text>
-          <Text className='text-regular'>Trip Date: {formatDateForDisplay(trip.dateStart)} - {formatDateForDisplay(trip.dateEnd)}</Text>
+          <Text className='h1 text-center'>{trip.name}</Text>
+          <Text className='text-regular text-center'>{formatDateForDisplay(trip.dateStart)} - {formatDateForDisplay(trip.dateEnd)}</Text>
 
+          {/***** Description Input *****/}
 
           <CustomInput
-            placeholder="Enter expense description"
-            label='Expense Description'
+            placeholder="Describe the expense"
+            label='Description'
+            labelClassName='h3'
             value={expense.description}
             onChangeText={(text) => setExpense({ ...expense, description: text })}
+
           />
 
+          {/***** Date Picker *****/}
 
           <View>
-            <Text className="label">Date</Text>
+            <Text className="h3">Date</Text>
             <DatePicker
               value={expense.date}
               onDateChange={(date) => setExpense({ ...expense, date })}
+              maximumDate={new Date()} // Prevent future dates
             />
           </View>
 
+          {/***** Amount Input *****/}
 
           <CustomInput
             placeholder="Enter expense amount"
             label='Amount'
+            labelClassName='h3'
             value={amountInput}
             onChangeText={(text) => {
               setAmountInput(text);
@@ -289,51 +297,65 @@ const CreateExpense = () => {
             keyboardType="numeric"
           />
 
-
+          {/***** Currency Selection *****/}
           <View className='flex'>
-            <Text className='label'>Expence currency</Text>
-            <Dropdown
-              items={currencies}
-              selectedValue={expense.currency}
-              onValueChange={(currency) => setExpense({ ...expense, currency: currency as Currency })}
-              pickerStyle={{ height: 60 }}
-            />
+            <Text className='h3'>Expense currency</Text>
+
+            <View className='w-full flex flex-row gap-2 flex-wrap'>
+              {currencies.map((currency) => (
+                <TouchableOpacity
+                  key={currency.value}
+                  onPress={() => setExpense({ ...expense, currency: currency.value as Currency })}
+                  className={`w-[23%] h-12  ${expense.currency === currency.value ? 'border-2 border-secondary' : 'border border-gray-300'} rounded-xl flex items-center justify-center`}
+                >
+                  <Text numberOfLines={1} ellipsizeMode="tail">{currency.value}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
+          {/***** Payer Selection *****/}
 
           <View className='flex'>
-            <Text className='label'>Payer</Text>
-            <Dropdown
-              items={trip.participants.map(p => ({ label: p.name, value: p.$id }))}
-              selectedValue={expense.payerId}
-              onValueChange={(payerId) => setExpense({ ...expense, payerId })}
-              placeholder="Select Payer"
-              pickerStyle={{ height: 60 }}
-            />
+            <Text className='h3'>Payer</Text>
+
+            <View className='w-full flex flex-row gap-2 flex-wrap'>
+              {trip.participants.map((participant) => (
+                <TouchableOpacity
+                  key={participant.$id}
+                  onPress={() => setExpense({ ...expense, payerId: participant.$id })}
+                  className={`w-[48%] h-12  ${expense.payerId === participant.$id ? 'border-2 border-secondary' : 'border border-gray-300'} rounded-xl flex items-center justify-center`}
+                >
+                  <Text numberOfLines={1} ellipsizeMode="tail">{participant.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
+          {/***** Expense Type Selection *****/}
 
           <View className='flex'>
-            <Text className='label'>Type of expense</Text>
-
-            <Dropdown
-              items={expenseTypes}
-              selectedValue={expense.type}
-              onValueChange={(type) => setExpense({ ...expense, type: type as ExpenseType })}
-              pickerStyle={{ height: 60 }}
-            />
-
-
+            <Text className='h3'>Select expense type</Text>
+            <View className='flex flex-row gap-2'>
+              {expenseTypes.map((type) => (
+                <TouchableOpacity
+                  key={type.value}
+                  onPress={() => setExpense({ ...expense, type: type.value as ExpenseType })}
+                  className={`w-[32%] h-12  ${expense.type === type.value ? 'border-2 border-secondary' : 'border border-gray-300'} rounded-xl flex items-center justify-center`}
+                >
+                  <Text>{type.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
             <View className='flex'>
-              {expense.type === "individual" ? (
-                <Text className='label'>{shares[0].share}</Text>
-              ) : (
+              {expense.type !== "individual" && (
                 <>
                   <Text className='label'>
                     Select participants who should pay for this expense
                   </Text>
 
                   {/* Select All/None Button */}
+
                   <View style={{ marginBottom: 8 }}>
                     <CustomCheckbox
                       isChecked={selectedParticipants.length === trip.participants.length}
@@ -344,6 +366,7 @@ const CreateExpense = () => {
                   </View>
 
                   {/* Individual Participant Checkboxes */}
+
                   {expense.type === "shared" && (
                     <>
                       {trip.participants.map((participant: Participant) => (
@@ -421,12 +444,16 @@ const CreateExpense = () => {
                     </>
 
                   )}
+
                   {/* Error message if no participants selected */}
                   {selectedParticipants.length < 2 && (
                     <Text className='text-tertiary text-regular text-sm mt-2'>
                       Please select at least one participant
                     </Text>
                   )}
+
+                  {/* Edit shares buttons */}
+                
                   {!!expense.amount && selectedParticipants.length > 1 && (
                     <View className='flex items-end'>
                       {isEditAmount ? (
@@ -443,12 +470,11 @@ const CreateExpense = () => {
 
                 </>
               )}
-
-
             </View>
           </View>
 
-
+          {/***** Create Expense Button *****/}
+          
           <CustomButton text="Create Expense" onPress={() => createExpenseHandler(expense)} />
         </>
       )}

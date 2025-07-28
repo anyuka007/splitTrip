@@ -3,11 +3,11 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import cn from "clsx"
 import { CustomInputProps } from '@/type';
 
-const CustomInput = ({placeholder="Enter text", value, onChangeText, label, secureTextEntry = false, keyboardType="default"} : CustomInputProps) => {
+const CustomInput = ({placeholder="Enter text", value, onChangeText, label, secureTextEntry = false, keyboardType="default", labelClassName="label"} : CustomInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
    return (
         <View className='w-full '>
-            <Text className='label'>{label}</Text>
+            <Text className={labelClassName}>{label}</Text>
             <TextInput 
             autoCapitalize='none'
             autoCorrect={false}
@@ -19,7 +19,8 @@ const CustomInput = ({placeholder="Enter text", value, onChangeText, label, secu
             onBlur={() => setIsFocused(false)}
             placeholder={placeholder}
             placeholderTextColor={"#888"}
-            className={cn("input", isFocused ? "border-secondary" : "border-myGray")}/>
+            className={cn("input", isFocused ? "border-secondary" : "border-myGray")}
+            />
         </View>
     );
 }

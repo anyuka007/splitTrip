@@ -89,6 +89,7 @@ export interface CustomInputProps {
     placeholder?: string;
     value?: string;    
     label?: string;
+    labelClassName?: string;
     secureTextEntry?: boolean;
     keyboardType?: KeyboardTypeOptions;
     onChangeText?: (text: string) => void;
