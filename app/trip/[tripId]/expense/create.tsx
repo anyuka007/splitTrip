@@ -9,7 +9,7 @@ import { Currency, Expense, ExpenseType, Participant } from '@/type';
 import { formatDateForDisplay } from '@/utils/helpers';
 import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, View, } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 //import CheckBox from 'expo-checkbox';
@@ -55,6 +55,12 @@ const CreateExpense = () => {
   const [tempShares, setTempShares] = useState<Share[]>(shares);
   const [shareInputs, setShareInputs] = useState<Record<string, string>>({});
 
+  const [hasCustomShares, setHasCustomShares] = useState(false);
+
+  useEffect(() => {
+    console.log("shares", JSON.stringify(shares, null, 2));
+  }, [shares]);
+
   const updateTempShare = (participantId: string, share: number) => {
     setTempShares(prevShares => {
       const existingShare = prevShares.find(s => s.participantId === participantId);
@@ -64,6 +70,7 @@ const CreateExpense = () => {
         return [...prevShares, { participantId, share }];
       }
     });
+
   };
 
   const startEditMode = () => {
@@ -90,9 +97,21 @@ const CreateExpense = () => {
       );
       return;
     }
-
+    //console.log("tempShares", JSON.stringify(tempShares, null, 2));
     setShares([...tempShares]);
     setIsEditAmount(false);
+    setHasCustomShares(true);
+
+    // Unselect participants with 0 share
+    setSelectedParticipants(prev => {
+      return prev.filter(participantId => {
+        const share = tempShares.find(s => s.participantId === participantId)?.share || 0;
+        const isPayer = participantId === expense.payerId;
+
+        // Only keep participants with a share > 0 or if they are the payer
+        return isPayer || share > 0;
+      });
+    });
   };
 
   const cancelEditingShares = () => {
@@ -116,20 +135,32 @@ const CreateExpense = () => {
   };
 
   useEffect(() => {
-    if (isEditAmount) return; // Skip if in edit mode
+    if (isEditAmount || hasCustomShares) return; // Skip if in edit mode
 
+    //console.log("Auto-calculating shares...");
     if (expense.type === "individual") {
       setShares([{ participantId: expense.payerId, share: expense.amount }]);
     } else if (expense.type === "shared" && expense.amount && selectedParticipants.length > 0) {
       const shares = selectedParticipants.map(p => ({ participantId: p, share: Number((expense.amount / selectedParticipants.length).toFixed(2)) })) || []
       setShares(shares);
-      console.log("shares", JSON.stringify(shares, null, 2));
+      //console.log("shares", JSON.stringify(shares, null, 2));
     } else if (expense.type === "sponsored") {
       const allShares = selectedParticipants.map(p => ({ participantId: p, share: Number((expense.amount / (selectedParticipants.length - 1)).toFixed(2)) })) || []
       const sponsoredShares = allShares.filter(s => s.participantId !== expense.payerId);
       setShares(sponsoredShares);
     }
-  }, [expense.type, expense.amount, selectedParticipants, isEditAmount]);
+  }, [expense.type, expense.amount, selectedParticipants, isEditAmount, hasCustomShares]);
+
+  useEffect(() => {
+    setSelectedParticipants(trip?.participants.map(p => p.$id) || []);
+    setIsEditAmount(false);
+  }, [expense.type, expense.amount]);
+
+  // Reset custom shares when type or payer changes
+  useEffect(() => {
+    //console.log("Resetting custom shares flag due to type/payer change");
+    setHasCustomShares(false);
+  }, [expense.type, expense.payerId]);
 
   // Participant selection toggle function
   const toggleParticipant = (participantId: string) => {
@@ -149,7 +180,7 @@ const CreateExpense = () => {
     if (selectedParticipants.length === trip?.participants.length) {
       // Deselect all
       setSelectedParticipants([expense.payerId]);
-      console.log("selectedParticipants:", selectedParticipants); // Ensure payer is always included
+      //console.log("selectedParticipants:", selectedParticipants);
 
     } else {
       // Select all
@@ -318,7 +349,7 @@ const CreateExpense = () => {
                                 {getShareValue(participant.$id)} {expense.currency}
                               </Text>
                             ) : (
-                              <CustomInput
+                              <TextInput
                                 placeholder="Enter share amount"
                                 value={shareInputs[participant.$id] ?? getShareValue(participant.$id).toString()}
                                 onChangeText={(text) => {
@@ -326,6 +357,7 @@ const CreateExpense = () => {
                                   const parsed = parseFloat(text.replace(',', '.'));
                                   updateTempShare(participant.$id, isNaN(parsed) ? 0 : parsed);
                                 }}
+                                style={{ borderBottomWidth: 1, borderColor: '#ccc', padding: 8, borderRadius: 4, width: '30%' }}
                                 keyboardType='numeric'
                               />
                             )
