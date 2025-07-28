@@ -31,7 +31,7 @@ const ExpenseItem = ({
 
     // Hilfsfunktion: Namen aus participantId holen
     const getParticipantName = (participantId: string) => {
-        const participant = trip.participants.find(p => p.$id === participantId);
+        const participant = trip.participants.find((p: Participant) => p.$id === participantId);
         return participant ? participant.name : '';
     };
 
@@ -41,7 +41,7 @@ const ExpenseItem = ({
         .map(share => getParticipantName(share.participantId))
         .filter(name => !!name)
 
-    console.log("participantsWhoShareNames:", participantsWhoShareNames);
+    //console.log("participantsWhoShareNames:", participantsWhoShareNames);
 
     return (
         <Pressable className='bg-white rounded-xl flex justify-between p-3 mb-3'
