@@ -1,8 +1,7 @@
 import { getDocument } from "@/utils/generics";
 import { appwriteConfig, databases } from "./appwrite";
-import { Expense } from "@/type";
+import { Expense, ExpenseData } from "@/type";
 import { ID, Query } from "react-native-appwrite";
-import { ExpenseData } from "@/app/trip/[tripId]/expense/create";
 
 export const getExpensesByTripId = async (tripId: string): Promise<Expense[]> => {
     try {

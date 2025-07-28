@@ -1,4 +1,4 @@
-import { ID } from "react-native-appwrite";
+import { ID, Query } from "react-native-appwrite";
 import { appwriteConfig, databases } from "./appwrite";
 import { ExpenseShare, CreateExpenseShareData } from "@/type";
 
@@ -16,3 +16,17 @@ export const createExpenseShare = async (shareData: CreateExpenseShareData): Pro
     throw error;
   }
 };
+
+export const getExpenseSharesByExpenseId = async (expenseId: string): Promise<ExpenseShare[]> => {
+  try {
+    const response = await databases.listDocuments<ExpenseShare>(
+      appwriteConfig.databaseId!,
+      appwriteConfig.expenseSharesCollectionId!,
+      [Query.select(["*"]), Query.equal("expenseId", [expenseId])]
+    );
+    return response.documents;
+  } catch (error) {
+    console.error("Error fetching expense shares:", error);
+    throw error;
+  }
+}
