@@ -12,6 +12,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { use, useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, View, } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Models } from 'react-native-appwrite';
+import { createExpenseShare } from '@/lib/expenseShares';
 //import CheckBox from 'expo-checkbox';
 
 interface CreateExpenseProps {
@@ -33,9 +35,23 @@ export interface ExpenseData {
   payerId: string;
 }
 
-interface Share {
+export interface Share {
   participantId: string;
   share: number;
+}
+
+export interface ExpenseShare extends Models.Document {
+  tripId: string;
+  expenseId: string;
+  participantId: string;
+  amount: number;
+}
+
+export interface CreateExpenseShareData {
+  tripId: string;
+  expenseId: string;
+  participantId: string;
+  amount: number;
 }
 
 const CreateExpense = () => {
@@ -59,6 +75,7 @@ const CreateExpense = () => {
 
   useEffect(() => {
     console.log("shares", JSON.stringify(shares, null, 2));
+    console.log("selectedParticipants", selectedParticipants);
   }, [shares]);
 
   const updateTempShare = (participantId: string, share: number) => {
@@ -208,24 +225,52 @@ const CreateExpense = () => {
   };
 
   const createExpenseHandler = async (expenseData: ExpenseLike): Promise<Expense> => {
-    if (!expense.description.trim()) {
-      Alert.alert("Missing description", "Please enter a description.");
-      return Promise.reject();
-    }
-    if (expense.amount <= 0) {
-      Alert.alert("Invalid amount", "Please enter a valid amount.");
-      return Promise.reject();
-    }
-    try {
+  if (!expense.description.trim()) {
+    Alert.alert("Missing description", "Please enter a description.");
+    return Promise.reject(new Error("Missing description"));
+  }
+  if (expense.amount <= 0) {
+    Alert.alert("Invalid amount", "Please enter a valid amount.");
+    return Promise.reject(new Error("Invalid amount"));
+  }
+  
+  try {
+    const newExpense = await createExpense(expenseData);
+    const expenseId = newExpense.$id;
+    
+    // Create shares using the input data type
+    const expenseSharesData: CreateExpenseShareData[] = 
+    
+    expense.type === "individual" ? 
+    [{ tripId: tripId as string, expenseId, participantId: expense.payerId, amount: expense.amount }] :
+    expense.type === "shared" ? 
+    selectedParticipants.map(participantId => ({
+      tripId: tripId as string,
+      expenseId,
+      participantId,
+      amount: getShareValue(participantId)
+    })) :
 
-      const newExpense = await createExpense(expenseData);
-      router.push(`/trip/${tripId}`);
-      return newExpense;
-    } catch (error) {
-      console.error("Error creating expense:", error);
-      throw error;
-    }
-  };
+    selectedParticipants.filter(p => p !== expense.payerId).map(participantId => ({
+      tripId: tripId as string,
+      expenseId,
+      participantId,
+      amount: getShareValue(participantId)
+    }));  
+    
+    // Save shares to the database (createExpenseShare returns ExpenseShare documents)
+    const createdShares: ExpenseShare[] = await Promise.all(
+      expenseSharesData.map(shareData => createExpenseShare(shareData))
+    );
+    
+    router.push(`/trip/${tripId}/expense/${expenseId}`);
+    return newExpense;
+  } catch (error) {
+    console.error("Error creating expense:", error);
+    Alert.alert("Error", "Failed to create expense");
+    throw error; // Better than Promise.reject()
+  }
+};
 
   return (
     <KeyboardAwareScrollView
