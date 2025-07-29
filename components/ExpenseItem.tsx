@@ -74,7 +74,7 @@ const ExpenseItem = ({
                             <Avatar key={index} name={name} />
                         ))
                     ) : (
-                        <Text className="text-regular text-xs text-myGray">No participants</Text>
+                        <Text className="text-regular text-xs text-myGray">Individual expense</Text>
                     )}
 
                 </View>

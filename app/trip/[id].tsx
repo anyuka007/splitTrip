@@ -4,7 +4,7 @@ import { Link, router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState, useRef } from 'react';
 import { Pressable, Text, TextInput, View, Alert, ScrollView } from 'react-native';
 import { formatDateForDisplay } from '@/utils/helpers';
-import { Expense, UpdateTripData } from '@/type';
+import { Expense, ExpenseShare, Participant, UpdateTripData } from '@/type';
 import { updateTrip } from '@/lib/trips';
 import CustomButton from '@/components/CustomButton';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -14,7 +14,7 @@ import ExpenseItem from '@/components/ExpenseItem';
 
 const TripDetails = () => {
     const { id } = useLocalSearchParams();
-    const { trips, editTrip, fetchExpenses, getExpensesForTrip, expensesLoading } = useTripsStore();
+    const { trips, editTrip, fetchExpenses, getExpensesForTrip, getExpenseSharesForExpense, fetchExpenseShares, expensesLoading,  } = useTripsStore();
 
     // Handle id type properly
     const tripId = Array.isArray(id) ? id[0] : id;
@@ -32,11 +32,26 @@ const TripDetails = () => {
 
 useEffect(() => {
         if (tripId && expenseList.length === 0 && !expensesLoading) {
-            fetchExpenses(tripId); // ✅ Rufen Sie fetchExpenses auf!
+            fetchExpenses(tripId);
+            
         }
     }, [tripId]);
 
+    // Fetch expense shares for each expense when the trip loads
+    useEffect(() => {
+  if (expenseList.length > 0) {
+    expenseList.forEach(expense => {
+      // Nur fetchen, wenn noch nicht im Store!
+      if (getExpenseSharesForExpense(expense.$id).length === 0) {
+        fetchExpenseShares(expense.$id);
+      }
+    });
+  }
+}, [expenseList]);
 
+const shares = expenseList.flatMap(expense => getExpenseSharesForExpense(expense.$id));
+
+//console.log("shares: ", JSON.stringify(shares, null, 2));
 
     // *** Double-tap implementation
     const tapCount = useRef(0);
@@ -108,6 +123,36 @@ useEffect(() => {
         setEditingField(false);
     };
 
+    const participants = trip?.participants.map(participant => participant as Participant) || [];
+    const participantsIds = participants.map(participant => participant.$id) || [];
+
+    const paidByParticipant = (participantId: string): number => {
+        const expenses = expenseList.filter(expense => expense.payerId === participantId);
+        if (expenses.length > 0) {
+            return expenses.reduce((total, expense) => total + expense.amount, 0);
+        }
+        return 0;
+    }
+
+
+    const sharesByParticipant = (participantId: string) => {
+        return shares.filter(share => share.participantId === participantId);
+    };  
+
+    const participantBalance = (participantId: string) => {
+        const paid = paidByParticipant(participantId);
+        const shares = sharesByParticipant(participantId);
+        const totalShares = shares.reduce((total, share) => total + share.amount, 0);
+        const balance = { paid, shares:totalShares, balance: paid - totalShares };
+        return balance;
+    };
+
+    //console.log("share by participant:", sharesByParticipant(participantsIds[0]).map(share => share.amount));
+
+
+//console.log("participantsIds:", participantsIds);
+//console.log("paid by participant 1:", paidByParticipant(participantsIds[0]));
+
     if (!trip) {
         return (
             <View className="flex h-full items-center justify-center">
@@ -160,12 +205,37 @@ useEffect(() => {
             <View className='flex flex-row justify-between'>
                 <Text className='text-regular text-sm'>Participants: </Text>
                 <View className='flex flex-row gap-2'>
-                    <Text className='text-regular'>{trip?.participants.map(participant => participant.name).join(', ')}</Text>
+                    <Text className='text-regular'>{participants.map(participant => participant.name).join(', ')}</Text>
                 </View>
             </View>
         </View>
         <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full '>
-            <Text className='h2'>Balance</Text>
+            <Text className='h2'>Balances</Text>
+
+            {expenseList && expenseList.length > 0 ? (
+                <View>
+                    <View>
+                        <Text className='text-regular font-bold'>Shared balance:</Text>
+                    {participants.map((participant, index) => (
+                        <View key={index} className='flex flex-row items-center gap-1'>
+                            <Text className='text-regular'>{`${participant.name}: `}</Text>
+                            <Text className='text-regular'>{`${participantBalance(participant.$id).balance} ${trip.defaultCurrency}`}</Text>
+                        </View>
+                    ))}
+                    </View>
+                    <View>
+                        <Text className='text-regular font-bold'>Total spent:</Text>
+                    {participants.map((participant, index) => (
+                        <View key={index} className='flex flex-row items-center gap-1'>
+                            <Text className='text-regular'>{`${participant.name}: `}</Text>
+                            <Text className='text-regular'>{`${participantBalance(participant.$id).shares} ${trip.defaultCurrency}`}</Text>
+                        </View>
+                    ))}
+                    </View>
+                </View>
+            ) : (
+                <Text className='text-regular'>No expenses found</Text>
+            )}
         </View>
         <View className='flex  pb-4 mb-4 w-full '>
              <Text className='h2'>Expenses</Text>
