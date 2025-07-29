@@ -30,3 +30,17 @@ export const getExpenseSharesByExpenseId = async (expenseId: string): Promise<Ex
     throw error;
   }
 }
+
+export const getExpenseSharesByTripId = async (tripId: string): Promise<ExpenseShare[]> => {
+  try {
+    const response = await databases.listDocuments<ExpenseShare>(
+      appwriteConfig.databaseId!,
+      appwriteConfig.expenseSharesCollectionId!,
+      [Query.select(["*"]), Query.equal("tripId", [tripId])]
+    );
+    return response.documents;
+  } catch (error) {
+    console.error("Error fetching expense shares by trip:", error);
+    throw error;
+  }
+};

@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { Expense, ExpenseShare, TripWithParticipants } from '@/type';
 import { getTripsWithParticipants, updateTrip, } from '@/lib/trips';
-import { getExpensesByTripId } from '@/lib/expenses';
-import { getExpenseSharesByExpenseId } from '@/lib/expenseShares';
+import { getExpense, getExpensesByTripId } from '@/lib/expenses';
+import { getExpenseSharesByExpenseId, getExpenseSharesByTripId } from '@/lib/expenseShares';
 
 
 interface TripsState {
@@ -17,7 +17,8 @@ interface TripsState {
   expensesLoading: boolean;
 
   // ExpenseShares State
-  expenseShares: { [expenseId: string]: ExpenseShare[] };
+  expenseSharesByExpense: { [expenseId: string]: ExpenseShare[] };
+  expenseSharesByTrip: { [tripId: string]: ExpenseShare[] };
   
   // Trip Actions
   fetchTrips: (userId: string) => Promise<void>;
@@ -27,11 +28,15 @@ interface TripsState {
   fetchExpenses: (tripId: string) => Promise<void>;
 
   // Expense Shares Actions
-  fetchExpenseShares: (expenseId: string) => Promise<void>;
+  fetchExpenseSharesByExpense: (expenseId: string) => Promise<void>;
+  fetchExpenseSharesByTrip: (tripId: string) => Promise<void>;
+  
 
   //Selectors
   getExpensesForTrip: (tripId: string) => Expense[]
+
   getExpenseSharesForExpense: (expenseId: string) => ExpenseShare[];
+  getExpenseSharesForTrip: (tripId: string) => ExpenseShare[];
 }
 
 const useTripsStore = create<TripsState>((set, get) => ({
@@ -42,7 +47,8 @@ const useTripsStore = create<TripsState>((set, get) => ({
   expenses: [],
   expensesByTrip: {},
   expensesLoading: false,
-  expenseShares: {},
+  expenseSharesByExpense: {},
+  expenseSharesByTrip: {},
 
   // Trip Actions
   fetchTrips: async (userId: string) => {
@@ -110,12 +116,12 @@ const useTripsStore = create<TripsState>((set, get) => ({
   
   // Expense Shares Actions
 
-  fetchExpenseShares: async (expenseId: string) => {    
+  fetchExpenseSharesByExpense: async (expenseId: string) => {    
     try {
       const shares = await getExpenseSharesByExpenseId(expenseId);
       set((state) => ({
-        expenseShares: {
-          ...state.expenseShares,
+        expenseSharesByExpense: {
+          ...state.expenseSharesByExpense,
           [expenseId]: shares
         }
       }));
@@ -127,13 +133,34 @@ const useTripsStore = create<TripsState>((set, get) => ({
     }
   },
 
+  fetchExpenseSharesByTrip: async (tripId: string) => {
+  try {
+    const shares = await getExpenseSharesByTripId(tripId);
+    set((state) => ({
+      expenseSharesByTrip: {
+        ...state.expenseSharesByTrip,
+        [tripId]: shares
+      }
+    }));
+  } catch (error) {
+    console.error('Error fetching expense shares by trip:', error);
+    set({
+      error: error instanceof Error ? error.message : 'Failed to fetch expense shares by trip'
+    });
+  }
+},
+
   // Selectors
   getExpensesForTrip: (tripId: string) => {
     return get().expensesByTrip[tripId] || [];
   },
 
   getExpenseSharesForExpense: (expenseId: string) => {
-    return get().expenseShares[expenseId] || [];
+    return get().expenseSharesByExpense[expenseId] || [];
+  }, 
+
+  getExpenseSharesForTrip: (tripId: string) => {
+    return get().expenseSharesByTrip[tripId] || [];
   }
 
 }));
