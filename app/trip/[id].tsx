@@ -89,7 +89,7 @@ const TripDetails = () => {
                 <View className="mb-4">
                     <View className="flex-row justify-between items-center">
                         <Text className="h2 text-primary w-[85%]" numberOfLines={2} ellipsizeMode="tail">{trip.name}</Text>
-                        <Pressable className="p-2 flex items-end justify-center" onPress={() => router.push(`/trip/edit/${tripId}`)}>
+                        <Pressable className="p-2 flex items-end justify-center" onPress={() => router.push(`/trip/${tripId}/edit`)}>
                             <FontAwesome name="edit" size={24} color="#f6c445" />
                         </Pressable>
                     </View>
