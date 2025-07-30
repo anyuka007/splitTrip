@@ -96,7 +96,7 @@ const TripDetails = () => {
                 </View>
                 <View className='flex flex-row justify-between'>
                     <Text className='text-regular font-bold'>Duration</Text>
-                    <Text className="text-regular text-sm">
+                    <Text className="text-regular">
                         {`${formatDateForDisplay(trip.dateStart)} - ${formatDateForDisplay(trip.dateEnd)}`}
                     </Text>
                 </View>
