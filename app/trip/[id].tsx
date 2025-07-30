@@ -122,19 +122,20 @@ const TripDetails = () => {
                     <View className='gap-4'>
                         <View>
                             <Text className='text-regular font-bold mb-2'>Shared balance</Text>
-                            {participants.map((participant) => {
+                            {participants.map((participant, index) => {
                                 const balanceObj = participantBalance(participant.$id);
                                 const isPositive = balanceObj.balance > 0;
+                                const isEven = index % 2 === 0;
                                 return (
                                     <View key={participant.$id} className={cn(
                                         "flex flex-row items-center justify-between rounded-lg px-2 py-2 mb-1",
-                                        isPositive ? "bg-green-50" : "bg-red-50"
+                                        isEven ? "bg-gray-50" : ""
                                     )}>
                                         <Text className='text-regular font-semibold'>{`${participant.name} `}</Text>
                                         <Text
                                             className={cn(
                                                 "text-regular font-semibold",
-                                                isPositive ? "text-green-600" : "text-red-600"
+                                                isPositive ? "" : "text-tertiary"
                                             )}
                                         >{`${participantBalance(participant.$id).balance} ${trip.defaultCurrency}`}</Text>
                                     </View>
@@ -143,12 +144,17 @@ const TripDetails = () => {
                         </View>
                         <View>
                             <Text className='text-regular font-bold mb-2'>Total spent</Text>
-                            {participants.map((participant, index) => (
-                                <View key={index} className='flex flex-row items-center justify-between rounded-lg px-2 py-2 mb-1 bg-gray-50'>
-                                    <Text className='text-regular font-semibold'>{`${participant.name} `}</Text>
-                                    <Text className='text-regular font-semibold'>{`${participantBalance(participant.$id).shares} ${trip.defaultCurrency}`}</Text>
-                                </View>
-                            ))}
+                            {participants.map((participant, index) => {
+                                const isEven = index % 2 === 0;
+                                return (
+                                    <View key={participant.$id} className={cn(
+                                        "flex flex-row items-center justify-between rounded-lg px-2 py-2 mb-1",
+                                        isEven ? "bg-gray-50" : ""
+                                    )}>
+                                        <Text className='text-regular font-semibold'>{`${participant.name} `}</Text>
+                                        <Text className='text-regular font-semibold'>{`${participantBalance(participant.$id).shares} ${trip.defaultCurrency}`}</Text>
+                                    </View>
+                            )})}
                         </View>
                     </View>
                 ) : (
@@ -158,7 +164,7 @@ const TripDetails = () => {
 
             {/* EXPENSES */}
             <View className='flex  pb-4 mb-4 w-full '>
-                <Text className='h2'>Expenses</Text>
+                <Text className='h2 mb-2'>Expenses</Text>
 
 
                 {tripExpenses && tripExpenses.length > 0 ? (
