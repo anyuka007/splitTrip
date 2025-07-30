@@ -100,8 +100,8 @@ const ExpenseDetails = () => {
                     "flex flex-row items-center justify-between rounded-lg px-2 py-2 mb-1",
                     isEven ? "bg-gray-50" : ""
                   )}>
-                    <Text className='text-regular font-semibold'>{`${participant!.name} `}</Text>
-                    <Text className='text-regular font-semibold'>{`${participant!.shareAmount} ${trip.defaultCurrency}`}</Text>
+                    <Text className='text-regular'>{`${participant!.name} `}</Text>
+                    <Text className='text-regular'>{`${participant!.shareAmount} ${trip.defaultCurrency}`}</Text>
                   </View>
                 );
               })}

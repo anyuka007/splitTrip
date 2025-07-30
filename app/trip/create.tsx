@@ -10,7 +10,7 @@ import { formatDateForDB } from '@/utils/helpers';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Platform, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { currencies } from '@/variables'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
@@ -155,12 +155,17 @@ const CreateTrip = () => {
 
             <View className='flex'>
                 <Text className='label'>Trip currency</Text>
-                <Dropdown
-                    items={currencies}
-                    selectedValue={formData.defaultCurrency}
-                    onValueChange={(currency) => updateField('defaultCurrency', currency as Currency)}
-                    pickerStyle={{ height: 60 }}
-                />
+                <View className='w-full flex flex-row gap-2 flex-wrap'>
+                              {currencies.map((currency) => (
+                                <TouchableOpacity
+                                  key={currency.value}
+                                    onPress={() => updateField('defaultCurrency', currency.value as Currency)}
+                                    className={`w-[23%] h-12  ${formData.defaultCurrency === currency.value ? 'border-2 border-secondary' : 'border border-gray-300'} rounded-xl flex items-center justify-center`}
+                                >
+                                  <Text numberOfLines={1} ellipsizeMode="tail">{currency.value}</Text>
+                                </TouchableOpacity>
+                              ))}
+                            </View>
             </View>
 
             <View className='flex'>
