@@ -2,16 +2,18 @@ import useTripsStore from '@/store/trips.store';
 import { Participant } from '@/type';
 import { formatDateForDisplay } from '@/utils/helpers';
 import { router, useLocalSearchParams } from 'expo-router';
-import * as React from 'react';
-import { Text, View, StyleSheet, Pressable } from 'react-native';
+import { Text, View, StyleSheet, Pressable, Alert } from 'react-native';
 import { useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import cn from "clsx";
+import { deleteExpense } from '@/lib/expenses';
+import CustomButton from '@/components/CustomButton';
+
 
 
 const ExpenseDetails = () => {
   const { expenseId, tripId } = useLocalSearchParams();
-  const { trips, getExpensesForTrip, fetchExpenseSharesByExpense, getExpenseSharesForExpense } = useTripsStore();
+  const { trips, fetchExpenses, getExpensesForTrip, fetchExpenseSharesByExpense, getExpenseSharesForExpense } = useTripsStore();
 
 
   // fetch expense shares when the component mounts
@@ -46,8 +48,23 @@ const ExpenseDetails = () => {
   }).filter(Boolean); // Filter out any null values
   //console.log("participantsWhoShare:", JSON.stringify(participantsWhoShare, null, 2));
 
+
+  // Function to delete the expense
+  const deleteHandler = async () => {
+    try {
+      await deleteExpense(expenseId as string);
+      // Refresh expenses after deletion
+      await fetchExpenses(tripId as string);
+
+      router.replace(`/trip/${tripId}`);
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      Alert.alert("Error", "Failed to delete expense. Please try again.");
+    }
+  };
+
   return (
-    <View className="px-4">
+    <View className="px-4 h-full">
 
       {!expense || !trip ? (
         <Text>Loading...</Text>
@@ -105,11 +122,15 @@ const ExpenseDetails = () => {
                   </View>
                 );
               })}
+
             </View>
           )}
         </View>
 
       )}
+      <View className='flex flex-row justify-end mt-4 absolute bottom-20 gap-2 w-full'>
+        <CustomButton text="Delete Expense" onPress={deleteHandler} classname='w-[45%] h-12 bg-tertiary rounded-xl my-2 flex items-center justify-center' />
+      </View>
     </View>
   );
 };

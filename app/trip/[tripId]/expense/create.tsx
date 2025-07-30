@@ -36,10 +36,6 @@ const CreateExpense = () => {
 
   const [hasCustomShares, setHasCustomShares] = useState(false);
 
-  /* useEffect(() => {
-    console.log("shares", JSON.stringify(shares, null, 2));
-    console.log("selectedParticipants", selectedParticipants);
-  }, [shares]); */
 
   // ==============================================================
   // SHARES MANAGEMENT

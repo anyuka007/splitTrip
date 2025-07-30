@@ -43,3 +43,34 @@ export const getExpense = async (expenseId: string): Promise<Expense> => {
         throw error;
     }
 }
+
+export const updateExpense = async (expenseId: string, expenseData: Partial<ExpenseData>): Promise<Expense> => {
+    try {
+        const response = await databases.updateDocument<Expense>(
+            appwriteConfig.databaseId!,
+            appwriteConfig.expensesCollectionId!,
+            expenseId,
+            expenseData
+        );
+        //console.log("Expense updated:", JSON.stringify(response, null, 2));
+        return response;
+    } catch (error) {
+        console.error("Error updating expense:", error);
+        throw error;
+    }
+};
+
+
+export const deleteExpense = async (expenseId: string): Promise<void> => {
+    try {
+        await databases.deleteDocument(
+            appwriteConfig.databaseId!,
+            appwriteConfig.expensesCollectionId!,
+            expenseId
+        );
+        //console.log("Expense deleted successfully");
+    } catch (error) {
+        console.error("Error deleting expense:", error);
+        throw error;
+    }
+};

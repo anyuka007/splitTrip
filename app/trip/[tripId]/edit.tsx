@@ -16,7 +16,7 @@ const EditTrip = (props: EditTripProps) => {
   const {tripId} = useLocalSearchParams()
 
   const [formData, setFormData] = React.useState<TripFormData>({
-          name: 'New one',
+          name: '',
           startDate: new Date(),
           endDate: new Date(),
           defaultCurrency: 'EUR'
@@ -62,7 +62,7 @@ const EditTrip = (props: EditTripProps) => {
   return (
     <View className='flex gap-4 bg-white  p-5 mt-3' style= {{marginBottom: Platform.OS === 'ios' ? 20 : 50}}>
       <CustomInput
-                placeholder="Enter trip name"
+                placeholder="Enter new trip name"
                 value={formData.name}
                 label="Trip Name"
                 onChangeText={(text) => updateField('name', text)}
