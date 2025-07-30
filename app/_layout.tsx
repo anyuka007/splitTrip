@@ -39,7 +39,7 @@ export default function RootLayout() {
     }
   }>
     <Stack.Screen name="(tabs)" options={{
-      headerShown: false,
+      headerShown: false, title: "Home",
     }} />
     <Stack.Screen name="(auth)" options={{
       headerShown: false,
@@ -47,7 +47,9 @@ export default function RootLayout() {
     <Stack.Screen name="participant/[id]" options={{title: "Participant Details"}} />
     <Stack.Screen name="trip/[id]" options={{title: "Trip Details"}} />
     <Stack.Screen name="trip/create" options={{title: "Create Trip"}} />
+    <Stack.Screen name="trip/[tripId]/edit" options={{title: "Edit Trip"}} />
     <Stack.Screen name="trip/[tripId]/expense/create" options={{title: "Create Expense"}} />
     <Stack.Screen name="trip/[tripId]/expense/[expenseId]" options={{title: "Expense"}} />
+    <Stack.Screen name="trip/[tripId]/expense/edit/[expenseId]" options={{title: "Edit Expense"}} />
   </Stack>;
 }
