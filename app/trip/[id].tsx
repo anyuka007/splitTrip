@@ -85,28 +85,28 @@ const TripDetails = () => {
 
     return (
         <ScrollView style={{ flex: 1, height: '100%', paddingHorizontal: 16 }}>
-            <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full '>
+            <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full gap-1'>
                 <View className="mb-4">
                     <View className="flex-row justify-between items-center">
-                        <Text className="h1 w-[85%]" numberOfLines={2} ellipsizeMode="tail">{trip.name}</Text>
+                        <Text className="h2 text-primary w-[85%]" numberOfLines={2} ellipsizeMode="tail">{trip.name}</Text>
                         <Pressable className="p-2 flex items-end justify-center" onPress={() => router.push(`/trip/edit/${tripId}`)}>
                             <FontAwesome name="edit" size={24} color="#f6c445" />
                         </Pressable>
                     </View>
                 </View>
                 <View className='flex flex-row justify-between'>
-                    <Text className='text-regular font-bold'>Duration</Text>
+                    <Text className='h4'>Duration</Text>
                     <Text className="text-regular">
                         {`${formatDateForDisplay(trip.dateStart)} - ${formatDateForDisplay(trip.dateEnd)}`}
                     </Text>
                 </View>
 
                 <View className='flex flex-row justify-between'>
-                    <Text className='text-regular font-bold'>Currency</Text>
+                    <Text className='h4'>Currency</Text>
                     <Text className='text-regular'>{trip.defaultCurrency}</Text>
                 </View>
                 <View className='flex flex-row justify-between'>
-                    <Text className='text-regular font-bold'>Participants </Text>
+                    <Text className='h4'>Participants </Text>
                     <View className='flex flex-row gap-2'>
                         <Text className='text-regular'>{participants.map(participant => participant.name).join(', ')}</Text>
                     </View>
@@ -116,12 +116,12 @@ const TripDetails = () => {
             {/* BALANCES */}
             <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full '>
 
-                <Text className='h2 mb-2'>Balances</Text>
+                <Text className='h2 text-primary mb-2'>Balances</Text>
 
                 {tripExpenses && tripExpenses.length > 0 ? (
                     <View className='gap-4'>
                         <View>
-                            <Text className='text-regular font-bold mb-2'>Shared balance</Text>
+                            <Text className='h4 mb-2'>Shared balance</Text>
                             {participants.map((participant, index) => {
                                 const balanceObj = participantBalance(participant.$id);
                                 const isPositive = balanceObj.balance > 0;
@@ -143,7 +143,7 @@ const TripDetails = () => {
                             })}
                         </View>
                         <View>
-                            <Text className='text-regular font-bold mb-2'>Total spent</Text>
+                            <Text className='h4 mb-2'>Total spent</Text>
                             {participants.map((participant, index) => {
                                 const isEven = index % 2 === 0;
                                 return (
@@ -164,7 +164,7 @@ const TripDetails = () => {
 
             {/* EXPENSES */}
             <View className='flex  pb-4 mb-4 w-full '>
-                <Text className='h2 mb-2'>Expenses</Text>
+                <Text className='h2 text-primary mb-2'>Expenses</Text>
 
 
                 {tripExpenses && tripExpenses.length > 0 ? (

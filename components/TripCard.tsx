@@ -32,16 +32,21 @@ const TripCard = ({ trip }: TripCardParams) => {
     ellipsizeMode="tail">
                         {trip.name}
                     </Text>
-                    <Text className="text-regular text-xs">
+                    <Text className="text-regular">
                         {`${formatDateForDisplay(trip.dateStart)} - ${formatDateForDisplay(trip.dateEnd)}`}
                     </Text>
-                    <Text className="text-regular text-xs text-myGray mt-1">
-                        Currency: {trip.defaultCurrency}
-                    </Text>
+                    <View className='flex flex-row justify-between items-center'>
+                        <Text className="text-regular">
+                            Currency 
+                        </Text>
+                        <Text className="text-regular">
+                            {trip.defaultCurrency}
+                        </Text>
+                    </View>
                 </View>
 
                 <View className='flex flex-row items-center justify-between mt-2'>
-                    <Text className='h3'>Participants:</Text>
+                    <Text className='h3'>Participants</Text>
                     <View className='flex-row justify-end items-center h-12 gap-0.5'>
                         {trip.participants.length > 0 ? (
                             trip.participants.slice(0, 3).map((participant, index) => (
