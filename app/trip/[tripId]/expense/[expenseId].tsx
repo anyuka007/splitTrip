@@ -4,6 +4,7 @@ import { formatDateForDisplay } from '@/utils/helpers';
 import { useLocalSearchParams } from 'expo-router';
 import * as React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
 
 interface ExpenseDetailsProps {
 
@@ -11,8 +12,17 @@ interface ExpenseDetailsProps {
 
 const ExpenseDetails = ({ }: ExpenseDetailsProps) => {
   const { expenseId, tripId } = useLocalSearchParams();
-  const { trips, getExpensesForTrip } = useTripsStore();
+  const { trips, getExpensesForTrip, fetchExpenseSharesByExpense, getExpenseSharesForExpense  } = useTripsStore();
 
+  useEffect(() => {
+    if (tripId) {
+      fetchExpenseSharesByExpense(expenseId as string);
+    }
+  }, [expenseId, tripId, fetchExpenseSharesByExpense]);
+
+  const shares = getExpenseSharesForExpense(expenseId as string);
+  console.log("shares:", JSON.stringify(shares, null, 2));
+  
   const expenses = getExpensesForTrip(tripId as string);
   const expense = expenses.find(e => e.$id === expenseId);
   //console.log("expense:", JSON.stringify(expense, null, 2));
