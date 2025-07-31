@@ -8,6 +8,7 @@ import { currencies } from "@/variables";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Text, View, Alert, TouchableOpacity, Platform } from "react-native";
+import Toast from "react-native-toast-message";
 
 const EditExpense = () => {
   const { tripId, expenseId } = useLocalSearchParams();
@@ -51,7 +52,11 @@ const EditExpense = () => {
     try {
       await updateExpense(expenseId as string, formData);
       await fetchExpenses(tripId as string);
-      Alert.alert("Expense updated successfully!");
+      /* Alert.alert("Expense updated successfully!"); */
+      Toast.show({
+        type: "success",
+        text1: "Expense updated successfully!"
+      });
       router.back();
     } catch (error) {
       console.error("Error updating expense:", error);

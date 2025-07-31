@@ -3,6 +3,7 @@ import "./global.css";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import useAuthStore from "@/store/auth.store";
+import Toast from "react-native-toast-message";
 
 export default function RootLayout() {
   const { isLoading, fetchAuthenticatedUser } = useAuthStore();
@@ -31,7 +32,8 @@ export default function RootLayout() {
     return null;
   }
 
-  return <Stack screenOptions={
+  return (
+  <><Stack screenOptions={
     {
       contentStyle: {
         backgroundColor: "#fff",
@@ -51,5 +53,8 @@ export default function RootLayout() {
     <Stack.Screen name="trip/[tripId]/expense/create" options={{title: "New Expense"}} />
     <Stack.Screen name="trip/[tripId]/expense/[expenseId]" options={{title: "Expense Details"}} />
     <Stack.Screen name="trip/[tripId]/expense/edit/[expenseId]" options={{title: "Edit Expense"}} />
-  </Stack>;
+  </Stack>
+  <Toast />
+  </>
+  );
 }

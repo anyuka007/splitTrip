@@ -20,6 +20,7 @@ import {
 import { currencies } from "@/variables";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useTripsStore from "@/store/trips.store";
+import Toast from "react-native-toast-message";
 
 const CreateTrip = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -125,7 +126,11 @@ const CreateTrip = () => {
       }
       await fetchTrips(user!.$id as string);
 
-      Alert.alert("Trip created successfully!");
+      /* Alert.alert("Trip created successfully!"); */
+      Toast.show({
+        type: "success",
+        text1: "Trip created successfully!",
+      });
       router.replace(`/trip/${tripId}`);
       //console.log("Trip Created:", tripData);
     } catch (error: any) {

@@ -27,6 +27,7 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { createExpenseShare } from "@/lib/expenseShares";
+import Toast from "react-native-toast-message";
 
 const CreateExpense = () => {
   const { tripId } = useLocalSearchParams();
@@ -183,7 +184,7 @@ const CreateExpense = () => {
     expense.amount,
     selectedParticipants,
     isEditAmount,
-    hasCustomShares
+    hasCustomShares,
   ]);
 
   // Reset selected participants when type or amount changes
@@ -292,6 +293,10 @@ const CreateExpense = () => {
       // Update store
       await fetchExpenses(tripId as string);
 
+      Toast.show({
+        type: "success",
+        text1: "Expense created successfully!",
+      });
       // Navigate back
       router.back();
     } catch (error) {

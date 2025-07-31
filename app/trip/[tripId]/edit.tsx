@@ -10,6 +10,7 @@ import { currencies } from "@/variables";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Text, View, Alert, TouchableOpacity, Platform } from "react-native";
+import Toast from "react-native-toast-message";
 
 const EditTrip = () => {
   const { tripId } = useLocalSearchParams();
@@ -74,7 +75,11 @@ const EditTrip = () => {
       await updateTrip(tripId as string, tripEditData);
       await fetchTrips(user!.$id as string);
 
-      Alert.alert("Trip updated successfully!");
+      /* Alert.alert("Trip updated successfully!"); */
+      Toast.show({
+        type: "success",
+        text1: "Trip updated successfully!"
+      });
       router.back();
       //console.log("Trip Updated:", tripData);
     } catch (error: any) {
