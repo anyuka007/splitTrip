@@ -73,7 +73,7 @@ const EditTrip = () => {
       const newTrip = await updateTrip(tripId as string, tripEditData);
 
       Alert.alert("Trip updated successfully!");
-      router.replace("/");
+      router.back();
       //console.log("Trip Updated:", tripData);
 
     } catch (error: any) {
