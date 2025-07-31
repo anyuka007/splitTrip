@@ -83,10 +83,8 @@ const [showModal, setShowModal] = useState(false);
           <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full gap-2 '>
             <View className="mb-4">
               <View className="flex-row justify-between items-center">
-                <Text className="h1 w-[85%]" numberOfLines={2} ellipsizeMode="tail">{expense.description}</Text>
-                <Pressable className="p-2 flex items-end justify-center" onPress={() => router.push(`/trip/${tripId}/expense/edit/${expenseId}`)}>
-                  <FontAwesome name="edit" size={24} color="#f6c445" />
-                </Pressable>
+                <Text className="h2 text-primary w-[75%]" numberOfLines={2} ellipsizeMode="tail">{expense.description}</Text>
+                <CustomButton text="Edit" onPress={() => router.push(`/trip/${tripId}/expense/edit/${expenseId}`)} classname='w-[23%] h-12 bg-secondary rounded-xl my-2 flex items-center justify-center' />
               </View>
             </View>
             <View className='flex flex-row justify-between'>
@@ -115,7 +113,7 @@ const [showModal, setShowModal] = useState(false);
 
           {expense.type !== "individual" && (
             <View className='flex border-b-[1px] border-primary  pb-4 mb-4 w-full '>
-              <Text className='h2 mb-2'>Shares</Text>
+              <Text className='h2 text-primary mb-2'>Shares</Text>
 
               {participantsWhoShare.map((participant, index) => {
                 const isEven = index % 2 === 0;

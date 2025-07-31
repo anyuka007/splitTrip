@@ -2,15 +2,14 @@ import CustomButton from '@/components/CustomButton';
 import CustomCheckbox from '@/components/CustomCheckbox';
 import CustomInput from '@/components/CustomInput';
 import DatePicker from '@/components/DatePicker';
-import Dropdown from '@/components/Dropdown';
 import { createExpense } from '@/lib/expenses';
 import useTripsStore from '@/store/trips.store';
-import { CreateExpenseShareData, Currency, Expense, ExpenseData, ExpenseLike, ExpenseType, Participant, Share } from '@/type';
+import { CreateExpenseShareData, Currency, ExpenseData, ExpenseLike, ExpenseType, Participant, Share } from '@/type';
 import { formatDateForDisplay } from '@/utils/helpers';
 import { currencies, expenseTypes } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
+import { Alert, Platform, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { createExpenseShare } from '@/lib/expenseShares';
 
@@ -127,7 +126,7 @@ const CreateExpense = () => {
       const sponsoredShares = allShares.filter(s => s.participantId !== expense.payerId);
       setShares(sponsoredShares);
     }
-  }, [expense.type, expense.amount, selectedParticipants, isEditAmount, hasCustomShares]);
+  }, [expense.type, expense.amount, selectedParticipants, isEditAmount, hasCustomShares, expense.payerId]);
 
 
   // Reset selected participants when type or amount changes
@@ -138,7 +137,7 @@ const CreateExpense = () => {
       setSelectedParticipants(trip?.participants?.map(p => p.$id) ?? []);
     }
     setIsEditAmount(false);
-  }, [expense.type, expense.amount]);
+  }, [expense.type, expense.amount, expense.payerId, trip?.participants]);
 
   // Reset custom shares when type or payer changes
   useEffect(() => {
@@ -178,7 +177,7 @@ const CreateExpense = () => {
     if (expense.payerId && !selectedParticipants.includes(expense.payerId)) {
       setSelectedParticipants(prev => [...prev, expense.payerId]);
     }
-  }, [expense.payerId]);
+  }, [expense.payerId, selectedParticipants]);
 
 
   // =================================================================
@@ -294,7 +293,7 @@ const CreateExpense = () => {
           />
 
           {/***** Currency Selection *****/}
-          <View className='flex'>
+          <View className='flex gap-2'>
             <Text className='h3'>Expense currency</Text>
 
             <View className='w-full flex flex-row gap-2 flex-wrap'>
@@ -312,7 +311,7 @@ const CreateExpense = () => {
 
           {/***** Payer Selection *****/}
 
-          <View className='flex'>
+          <View className='flex gap-2'>
             <Text className='h3'>Payer</Text>
 
             <View className='w-full flex flex-row gap-2 flex-wrap'>
@@ -330,7 +329,7 @@ const CreateExpense = () => {
 
           {/***** Expense Type Selection *****/}
 
-          <View className='flex'>
+          <View className='flex gap-2'>
             <Text className='h3'>Select expense type</Text>
             <View className='flex flex-row gap-2'>
               {expenseTypes.map((type) => (
@@ -480,6 +479,3 @@ const CreateExpense = () => {
 
 export default CreateExpense;
 
-const styles = StyleSheet.create({
-  container: {}
-});

@@ -7,7 +7,7 @@ import { Currency, ExpenseLike } from "@/type";
 import { currencies } from "@/variables";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Text, View, StyleSheet, Alert, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, Alert, TouchableOpacity, Platform } from "react-native";
 
 const EditExpense = () => {
   const { tripId, expenseId } = useLocalSearchParams();
@@ -57,7 +57,7 @@ const [formData, setFormData] = useState<ExpenseLike>(initialData);
   };
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: 'white', marginBottom: Platform.OS === 'ios' ? 0 : 50, padding: 20, gap: 16 }}>
       <CustomInput
         placeholder="Describe the expense"
         label="Description"
@@ -77,7 +77,7 @@ const [formData, setFormData] = useState<ExpenseLike>(initialData);
         />
       </View>
 
-      <View className="flex">
+      <View className="flex gap-2">
         <Text className="h3">Expense currency</Text>
 
         <View className="w-full flex flex-row gap-2 flex-wrap">
@@ -104,13 +104,11 @@ const [formData, setFormData] = useState<ExpenseLike>(initialData);
         </View>
       </View>
 
-      <CustomButton text="Save" onPress={submit} />
+      <CustomButton text="Save changes" onPress={submit} classname="bg-primary w-full h-12 flex items-center justify-center rounded-xl my-10"/>
     </View>
   );
 };
 
 export default EditExpense;
 
-const styles = StyleSheet.create({
-  container: {},
-});
+

@@ -67,14 +67,14 @@ const ExpenseItem = ({
                 <Text className='text-regular'>{trip.participants.find((p: Participant) => p.$id === expense.payerId)?.name}</Text>
             </View>
             <View className='flex flex-row items-center justify-between gap-2'>
-                <Text className='text-regular text-sm'>Shared with: </Text>
+                <Text className='text-regular text-sm'>{expense.type=== "shared" ? "Shared with: " : expense.type === "sponsored" ? "Paid for: " : ""}</Text>
                 <View className='flex-row justify-end items-center h-12 gap-0.5'>
                     {participantsWhoShareNames.length > 0 ? (
                         participantsWhoShareNames.map((name, index) => (
                             <Avatar key={index} name={name} />
                         ))
                     ) : (
-                        <Text className="text-regular text-xs text-myGray">Individual expense</Text>
+                        <Text className="text-regular text-myGray">Individual expense</Text>
                     )}
 
                 </View>
