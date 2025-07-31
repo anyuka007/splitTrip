@@ -1,9 +1,11 @@
-import { create } from 'zustand';
-import { Expense, ExpenseShare, TripWithParticipants } from '@/type';
-import { getTripsWithParticipants, updateTrip, } from '@/lib/trips';
-import { getExpense, getExpensesByTripId } from '@/lib/expenses';
-import { getExpenseSharesByExpenseId, getExpenseSharesByTripId } from '@/lib/expenseShares';
-
+import { create } from "zustand";
+import { Expense, ExpenseShare, TripWithParticipants } from "@/type";
+import { getTripsWithParticipants, updateTrip } from "@/lib/trips";
+import { getExpense, getExpensesByTripId } from "@/lib/expenses";
+import {
+  getExpenseSharesByExpenseId,
+  getExpenseSharesByTripId,
+} from "@/lib/expenseShares";
 
 interface TripsState {
   // State
@@ -19,21 +21,23 @@ interface TripsState {
   // ExpenseShares State
   expenseSharesByExpense: { [expenseId: string]: ExpenseShare[] };
   expenseSharesByTrip: { [tripId: string]: ExpenseShare[] };
-  
+
   // Trip Actions
   fetchTrips: (userId: string) => Promise<void>;
-  editTrip: (tripId: string, data: Partial<TripWithParticipants>) => Promise<void>;
+  editTrip: (
+    tripId: string,
+    data: Partial<TripWithParticipants>
+  ) => Promise<void>;
 
-// Expense Actions
+  // Expense Actions
   fetchExpenses: (tripId: string) => Promise<void>;
 
   // Expense Shares Actions
   fetchExpenseSharesByExpense: (expenseId: string) => Promise<void>;
   fetchExpenseSharesByTrip: (tripId: string) => Promise<void>;
-  
 
   //Selectors
-  getExpensesForTrip: (tripId: string) => Expense[]
+  getExpensesForTrip: (tripId: string) => Expense[];
 
   getExpenseSharesForExpense: (expenseId: string) => ExpenseShare[];
   getExpenseSharesForTrip: (tripId: string) => ExpenseShare[];
@@ -57,16 +61,18 @@ const useTripsStore = create<TripsState>((set, get) => ({
       const trips = await getTripsWithParticipants(userId);
       set({ trips, loading: false });
     } catch (error) {
-      console.error('Error fetching trips:', error);
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch trips',
-        loading: false 
+      console.error("Error fetching trips:", error);
+      set({
+        error: error instanceof Error ? error.message : "Failed to fetch trips",
+        loading: false,
       });
     }
   },
 
-
-  editTrip: async (tripId: string, updateData: Partial<TripWithParticipants>) => {
+  editTrip: async (
+    tripId: string,
+    updateData: Partial<TripWithParticipants>
+  ) => {
     try {
       set({ loading: true, error: null });
 
@@ -75,18 +81,16 @@ const useTripsStore = create<TripsState>((set, get) => ({
 
       // Update Store - merge old trip with new data
       set((state) => ({
-        trips: state.trips.map(trip =>
-          trip.$id === tripId 
-            ? { ...trip, ...updateData }
-            : trip
+        trips: state.trips.map((trip) =>
+          trip.$id === tripId ? { ...trip, ...updateData } : trip
         ),
-        loading: false
+        loading: false,
       }));
     } catch (error) {
-      console.error('Error updating trip:', error);
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to update trip',
-        loading: false 
+      console.error("Error updating trip:", error);
+      set({
+        error: error instanceof Error ? error.message : "Failed to update trip",
+        loading: false,
       });
       throw error;
     }
@@ -98,57 +102,70 @@ const useTripsStore = create<TripsState>((set, get) => ({
       const expenses = await getExpensesByTripId(tripId);
       //console.log("Expenses fetched successfully:", JSON.stringify(expenses, null, 2));
 
-      set((state) => ({
-        expensesByTrip: {
-          ...state.expensesByTrip,
-          [tripId]: expenses
-        },
-        expensesLoading: false
-      }));
+      set((state) => {
+        const prev = state.expensesByTrip[tripId] || [];
+        const isSame = JSON.stringify(prev) === JSON.stringify(expenses); // oder tiefere Equality
+        if (isSame) return state;
+
+        return {
+          expensesByTrip: {
+            ...state.expensesByTrip,
+            [tripId]: expenses,
+          },
+          expensesLoading: false,
+        };
+      });
     } catch (error) {
-      console.error('Error fetching expenses:', error);
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch expenses',
-        expensesLoading: false 
+      console.error("Error fetching expenses:", error);
+      set({
+        error:
+          error instanceof Error ? error.message : "Failed to fetch expenses",
+        expensesLoading: false,
       });
     }
   },
-  
+
   // Expense Shares Actions
 
-  fetchExpenseSharesByExpense: async (expenseId: string) => {    
+  fetchExpenseSharesByExpense: async (expenseId: string) => {
     try {
       const shares = await getExpenseSharesByExpenseId(expenseId);
       set((state) => ({
         expenseSharesByExpense: {
           ...state.expenseSharesByExpense,
-          [expenseId]: shares
-        }
+          [expenseId]: shares,
+        },
       }));
     } catch (error) {
-      console.error('Error fetching expense shares:', error);
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch expense shares'
+      console.error("Error fetching expense shares:", error);
+      set({
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch expense shares",
       });
     }
   },
 
   fetchExpenseSharesByTrip: async (tripId: string) => {
-  try {
-    const shares = await getExpenseSharesByTripId(tripId);
-    set((state) => ({
-      expenseSharesByTrip: {
-        ...state.expenseSharesByTrip,
-        [tripId]: shares
-      }
-    }));
-  } catch (error) {
-    console.error('Error fetching expense shares by trip:', error);
-    set({
-      error: error instanceof Error ? error.message : 'Failed to fetch expense shares by trip'
-    });
-  }
-},
+    try {
+      const shares = await getExpenseSharesByTripId(tripId);
+      set((state) => ({
+        expenseSharesByTrip: {
+          ...state.expenseSharesByTrip,
+          [tripId]: shares,
+        },
+      }));
+    } catch (error) {
+      console.error("Error fetching expense shares by trip:", error);
+      set({
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch expense shares by trip",
+      });
+    }
+  },
 
   // Selectors
   getExpensesForTrip: (tripId: string) => {
@@ -157,12 +174,11 @@ const useTripsStore = create<TripsState>((set, get) => ({
 
   getExpenseSharesForExpense: (expenseId: string) => {
     return get().expenseSharesByExpense[expenseId] || [];
-  }, 
+  },
 
   getExpenseSharesForTrip: (tripId: string) => {
     return get().expenseSharesByTrip[tripId] || [];
-  }
-
+  },
 }));
 
 export default useTripsStore;

@@ -27,6 +27,8 @@ const EditTrip = () => {
 
   const [formData, setFormData] = useState<TripFormData>(initialData);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const isDataChanged = (initial: TripFormData, current: TripFormData) => {
     return (
       initial.name !== current.name ||
@@ -67,6 +69,7 @@ const EditTrip = () => {
       return Alert.alert("Error", "Please enter trip name");
     }
 
+    setIsSubmitting(true);
     try {
       await updateTrip(tripId as string, tripEditData);
       await fetchTrips(user!.$id as string);
@@ -77,6 +80,8 @@ const EditTrip = () => {
     } catch (error: any) {
       console.error("Updating Trip Error:", error);
       Alert.alert("Error", error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -136,6 +141,8 @@ const EditTrip = () => {
         onPress={() => {
           submit();
         }}
+        isLoading={isSubmitting}
+        whileLoadingText="Saving..."
       />
     </View>
   );

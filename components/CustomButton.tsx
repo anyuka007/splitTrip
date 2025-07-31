@@ -5,7 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const DEFAULT_BUTTON_LABEL = "Click Me";
 const DEFAULT_BUTTON_CLASSNAME = "bg-primary w-full h-12 flex items-center justify-center rounded-xl my-2";
 
-const CustomButton = ({ text = DEFAULT_BUTTON_LABEL, onPress, classname, disabled=false, isLoading=false }: CustomButtonProps) => {
+const CustomButton = ({ text = DEFAULT_BUTTON_LABEL, onPress, classname, disabled=false, isLoading=false, whileLoadingText }: CustomButtonProps) => {
 
     const buttonClassName = classname || DEFAULT_BUTTON_CLASSNAME;
 
@@ -16,7 +16,7 @@ const CustomButton = ({ text = DEFAULT_BUTTON_LABEL, onPress, classname, disable
             disabled={disabled}
             style={{ opacity: disabled ? 0.5 : 1 }}
         >
-            <Text className="h3 text-white text-center ">{text}</Text>
+            <Text className="h3 text-white text-center ">{isLoading && whileLoadingText ? whileLoadingText : text}</Text>
         </TouchableOpacity>
     );
 };

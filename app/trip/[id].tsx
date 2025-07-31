@@ -4,10 +4,9 @@ import ExpenseItem from "@/components/ExpenseItem";
 import useTripsStore from "@/store/trips.store";
 import { Expense, Participant } from "@/type";
 import { formatDateForDisplay } from "@/utils/helpers";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, router, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import cn from "clsx";
 
 const TripDetails = () => {
@@ -39,10 +38,10 @@ const TripDetails = () => {
 
   // Fetch expense shares for trip when the trip loads
   useEffect(() => {
-    if (tripId) {
+    if (tripId && shares.length === 0 && !expensesLoading) {
       fetchExpenseSharesByTrip(tripId);
     }
-  }, [tripId, fetchExpenseSharesByTrip]);
+  }, [tripId]);
 
   // Get all shares for the trip
   const shares = getExpenseSharesForTrip(tripId!); // Get all shares for the trip
@@ -104,9 +103,6 @@ const TripDetails = () => {
           >
             {trip.name}
           </Text>
-          {/* <Pressable className="p-2 flex items-end justify-center" onPress={() => router.push(`/trip/${tripId}/edit`)}>
-                            <FontAwesome name="edit" size={24} color="#f6c445" />
-                        </Pressable> */}
           <CustomButton
             text="Edit"
             onPress={() => router.push(`/trip/${tripId}/edit`)}

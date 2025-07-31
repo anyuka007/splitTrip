@@ -84,6 +84,7 @@ export interface CustomButtonProps {
     classname?: string;
     disabled?: boolean
     isLoading?: boolean;
+    whileLoadingText?: string;
 }
 export interface CustomInputProps {
     placeholder?: string;
