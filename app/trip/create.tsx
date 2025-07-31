@@ -126,7 +126,7 @@ const CreateTrip = () => {
       await fetchTrips(user!.$id as string);
 
       Alert.alert("Trip created successfully!");
-      router.push(`/trip/${tripId}`);
+      router.replace(`/trip/${tripId}`);
       //console.log("Trip Created:", tripData);
     } catch (error: any) {
       console.error("Creating Trip Error:", error);

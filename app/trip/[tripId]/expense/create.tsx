@@ -293,7 +293,7 @@ const CreateExpense = () => {
       await fetchExpenses(tripId as string);
 
       // Navigate back
-      router.push(`/trip/${trip!.$id}`);
+      router.back();
     } catch (error) {
       console.error("Error creating expense:", error);
       Alert.alert("Error", "Failed to create expense");

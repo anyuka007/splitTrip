@@ -71,7 +71,7 @@ const ExpenseDetails = () => {
     await deleteExpense(expenseId as string);
 
     setTimeout(() => {
-      router.replace(`/trip/${tripId}`);
+      router.back();
     }, 100); // React braucht Zeit, sich zu stabilisieren
 
     // Kein await – async im Hintergrund
