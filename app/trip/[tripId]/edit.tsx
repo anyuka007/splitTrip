@@ -8,7 +8,7 @@ import { formatDateForDB } from '@/utils/helpers';
 import { currencies } from '@/variables';
 import { router, useLocalSearchParams } from 'expo-router';
 import  {useState} from 'react';
-import { Text, View, StyleSheet, Alert, TouchableOpacity, Platform } from 'react-native';
+import { Text, View, Alert, TouchableOpacity, Platform } from 'react-native';
 
 
 const EditTrip = () => {
