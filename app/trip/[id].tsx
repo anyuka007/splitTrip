@@ -93,7 +93,8 @@ const TripDetails = () => {
   }
 
   return (
-    <ScrollView style={{ flex: 1, height: "100%", paddingHorizontal: 16 }}>
+    <View className="flex-1">
+    <ScrollView style={{ flex: 1, height: "100%", paddingHorizontal: 16 }} contentContainerStyle={{ paddingBottom: 100 }}>
       <View className="flex border-b-[1px] border-primary  pb-4 mb-4 w-full gap-1">
         <View className="mb-4 flex-row justify-between items-center">
           <Text
@@ -202,13 +203,19 @@ const TripDetails = () => {
         ) : (
           <Text className="text-regular">No expenses found</Text>
         )}
-        <CustomButton
+        {/* <CustomButton
           text="Add Expense"
           onPress={() => router.push(`/trip/${tripId}/expense/create`)}
-        />
+        /> */}
       </View>
-    </ScrollView>
-  );
+    </ScrollView><View className="absolute bottom-7 left-0 w-full px-4">
+      <CustomButton
+        text="Add Expense"
+        onPress={() => router.push(`/trip/${tripId}/expense/create`)}
+      />
+    </View>
+  </View>
+);
 };
 
 export default TripDetails;
