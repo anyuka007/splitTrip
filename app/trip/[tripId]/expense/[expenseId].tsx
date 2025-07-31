@@ -3,11 +3,12 @@ import { Participant } from '@/type';
 import { formatDateForDisplay } from '@/utils/helpers';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text, View, StyleSheet, Pressable, Alert } from 'react-native';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import cn from "clsx";
 import { deleteExpense } from '@/lib/expenses';
 import CustomButton from '@/components/CustomButton';
+import ConfirmModal from '@/components/ConfirmModal';
 
 
 
@@ -15,7 +16,12 @@ const ExpenseDetails = () => {
   const { expenseId, tripId } = useLocalSearchParams();
   const { trips, fetchExpenses, getExpensesForTrip, fetchExpenseSharesByExpense, getExpenseSharesForExpense } = useTripsStore();
 
+const [showModal, setShowModal] = useState(false);
 
+  const handleCancelInModal = () => {
+    console.log('Cancelled.');
+    setShowModal(false);
+  };
   // fetch expense shares when the component mounts
   useEffect(() => {
     if (tripId) {
@@ -54,6 +60,7 @@ const ExpenseDetails = () => {
     try {
       await deleteExpense(expenseId as string);
       // Refresh expenses after deletion
+      setShowModal(false);
       await fetchExpenses(tripId as string);
 
       router.replace(`/trip/${tripId}`);
@@ -129,7 +136,17 @@ const ExpenseDetails = () => {
 
       )}
       <View className='flex flex-row justify-end mt-4 absolute bottom-20 gap-2 w-full'>
-        <CustomButton text="Delete Expense" onPress={deleteHandler} classname='w-[45%] h-12 bg-tertiary rounded-xl my-2 flex items-center justify-center' />
+          <CustomButton text="Delete Expense" onPress={() => setShowModal(true)} classname='w-[45%] h-12 bg-tertiary rounded-xl my-2 flex items-center justify-center' />
+
+      <ConfirmModal
+        visible={showModal}
+        message="Are you sure you want to delete this expense?"
+        onConfirm={deleteHandler}
+        onCancel={handleCancelInModal}
+        confirmText="Yes"
+        cancelText="No"
+      />
+        
       </View>
     </View>
   );
