@@ -9,7 +9,7 @@ const CustomInput = ({placeholder="Enter text", value, onChangeText, label, secu
         <View className='w-full '>
             <Text className={labelClassName}>{label}</Text>
             <TextInput 
-            autoCapitalize='none'
+            autoCapitalize='sentences'
             autoCorrect={false}
             value={value}
             onChangeText={onChangeText}

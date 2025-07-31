@@ -1,37 +1,110 @@
-import CustomButton from '@/components/CustomButton';
-import { updateExpense } from '@/lib/expenses';
-import useTripsStore from '@/store/trips.store';
-import { ExpenseLike } from '@/type';
-import { router, useLocalSearchParams } from 'expo-router';
-import * as React from 'react';
-import { Text, View, StyleSheet, Alert } from 'react-native';
+import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
+import DatePicker from "@/components/DatePicker";
+import { updateExpense } from "@/lib/expenses";
+import useTripsStore from "@/store/trips.store";
+import { Currency, ExpenseLike } from "@/type";
+import { currencies } from "@/variables";
+import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { Text, View, StyleSheet, Alert, TouchableOpacity } from "react-native";
 
-interface EditExpenseProps {}
-
-const EditExpense = (props: EditExpenseProps) => {
-
+const EditExpense = () => {
   const { tripId, expenseId } = useLocalSearchParams();
-  const { trips, fetchExpenses } = useTripsStore();
-  const trip = trips.find(t => t.$id === tripId);
+  const { trips, fetchExpenses, getExpensesForTrip } = useTripsStore();
+  const trip = trips.find((t) => t.$id === tripId);
 
-  const [expense, setExpense] = React.useState<ExpenseLike>({ description: "test 222", amount: 300, currency: trip?.defaultCurrency || "EUR", date: new Date(), type: "individual", tripId: tripId as string, payerId: trip?.participants[0].$id || "" });
+  const expenses = getExpensesForTrip(tripId as string);
+  
+  const initialExpense = expenses.find((e) => e.$id === expenseId);
 
-const submit = async () => {
+  const initialData: ExpenseLike = {
+  description: initialExpense?.description || "",
+  amount: initialExpense?.amount || 0,
+  currency: initialExpense?.currency || trip?.defaultCurrency || "EUR",
+  date: initialExpense?.date ? new Date(initialExpense.date) : new Date(),
+  type: initialExpense?.type || "individual",
+  tripId: tripId as string,
+  payerId: initialExpense?.payerId || trip?.participants[0].$id || "",
+};
+
+const [formData, setFormData] = useState<ExpenseLike>(initialData);
+
+  const isDataChanged = (initial: ExpenseLike, current: ExpenseLike) => {
+  return (
+    initial.description !== current.description ||
+    initial.amount !== current.amount ||
+    initial.currency !== current.currency ||
+    initial.type !== current.type ||
+    initial.payerId !== current.payerId ||
+    initial.date.getTime() !== current.date.getTime()
+  );
+};
+
+  const submit = async () => {
     try {
-      await updateExpense(expenseId as string, expense);
+      if (!isDataChanged(initialData, formData)) {
+      Alert.alert("No changes detected");
+      return;
+    }
+      await updateExpense(expenseId as string, formData);
       await fetchExpenses(tripId as string);
       Alert.alert("Expense updated successfully!");
       router.back();
     } catch (error) {
       console.error("Error updating expense:", error);
-      
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
-      <Text>EditExpense</Text>
-      <CustomButton text="Save" onPress={submit} />  
+      <CustomInput
+        placeholder="Describe the expense"
+        label="Description"
+        labelClassName="h3"
+        value={formData.description}
+        onChangeText={(text) => setFormData({ ...formData, description: text })}
+      />
+
+      {/***** Date Picker *****/}
+
+      <View>
+        <Text className="h3">Date</Text>
+        <DatePicker
+          value={formData.date}
+          onDateChange={(date) => setFormData({ ...formData, date })}
+          maximumDate={new Date()} // Prevent future dates
+        />
+      </View>
+
+      <View className="flex">
+        <Text className="h3">Expense currency</Text>
+
+        <View className="w-full flex flex-row gap-2 flex-wrap">
+          {currencies.map((currency) => (
+            <TouchableOpacity
+              key={currency.value}
+              onPress={() =>
+                setFormData({
+                  ...formData,
+                  currency: currency.value as Currency,
+                })
+              }
+              className={`w-[23%] h-12  ${
+                formData.currency === currency.value
+                  ? "border-2 border-secondary"
+                  : "border border-gray-300"
+              } rounded-xl flex items-center justify-center`}
+            >
+              <Text numberOfLines={1} ellipsizeMode="tail">
+                {currency.value}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      <CustomButton text="Save" onPress={submit} />
     </View>
   );
 };
@@ -39,5 +112,5 @@ const submit = async () => {
 export default EditExpense;
 
 const styles = StyleSheet.create({
-  container: {}
+  container: {},
 });
