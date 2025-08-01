@@ -81,7 +81,8 @@ const TripDetails = () => {
       (total, share) => total + share.amount,
       0
     );
-    const balance = { paid, shares: totalShares, balance: paid - totalShares };
+    const balance = { paid, shares: totalShares.toFixed(2), balance: (paid - totalShares).toFixed(2) };
+    //console.log(`aaaaaBalance for ${participantId}:`, balance);
     return balance;
   };
 
@@ -147,7 +148,7 @@ const TripDetails = () => {
               <Text className="h4 mb-2">Shared balance</Text>
               {participants.map((participant, index) => {
                 const balanceObj = participantBalance(participant.$id);
-                const isPositive = balanceObj.balance > 0;
+                const isPositive = Number(balanceObj.balance) > 0;
                 const isEven = index % 2 === 0;
                 return (
                   <View
