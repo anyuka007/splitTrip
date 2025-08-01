@@ -4,10 +4,10 @@ import ExpenseItem from "@/components/ExpenseItem";
 import useTripsStore from "@/store/trips.store";
 import { Expense, Participant } from "@/type";
 import { formatDateForDisplay } from "@/utils/helpers";
+import cn from "clsx";
 import { Link, router, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
 import { ScrollView, Text, View } from "react-native";
-import cn from "clsx";
 
 const TripDetails = () => {
   const { id } = useLocalSearchParams();
@@ -28,23 +28,27 @@ const TripDetails = () => {
 
   // Fetch expenses when the trip loads
   useEffect(() => {
-    if (tripId && tripExpenses.length === 0 && !expensesLoading) {
+    if (tripId && !expensesLoading) {
       fetchExpenses(tripId);
     }
   }, [tripId]);
 
   // Use the store's selector to get expenses for this trip
   const tripExpenses = getExpensesForTrip(tripId!);
-
-  // Fetch expense shares for trip when the trip loads
-  useEffect(() => {
-    if (tripId && shares.length === 0 && !expensesLoading) {
-      fetchExpenseSharesByTrip(tripId);
-    }
-  }, [tripId]);
-
+  
   // Get all shares for the trip
   const shares = getExpenseSharesForTrip(tripId!); // Get all shares for the trip
+  //console.log("aaaaa Shares for trip:", shares);
+  
+  // Fetch expense shares for trip when the trip loads
+  useEffect(() => {
+    if (tripId && !expensesLoading) {
+      fetchExpenseSharesByTrip(tripId);
+      //console.log("aaaaaFetching shares for trip:", tripId);
+    }
+  }, [tripId, tripExpenses.length]);
+
+  
 
   // *** BALANCE CALCULATIONS ***
 

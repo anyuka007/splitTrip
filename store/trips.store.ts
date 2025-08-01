@@ -102,19 +102,13 @@ const useTripsStore = create<TripsState>((set, get) => ({
       const expenses = await getExpensesByTripId(tripId);
       //console.log("Expenses fetched successfully:", JSON.stringify(expenses, null, 2));
 
-      set((state) => {
-        const prev = state.expensesByTrip[tripId] || [];
-        const isSame = JSON.stringify(prev) === JSON.stringify(expenses); // oder tiefere Equality
-        if (isSame) return state;
-
-        return {
-          expensesByTrip: {
-            ...state.expensesByTrip,
-            [tripId]: expenses,
-          },
-          expensesLoading: false,
-        };
-      });
+      set((state) => ({
+      expensesByTrip: {
+        ...state.expensesByTrip,
+        [tripId]: expenses,
+      },
+      expensesLoading: false,
+    }));
     } catch (error) {
       console.error("Error fetching expenses:", error);
       set({

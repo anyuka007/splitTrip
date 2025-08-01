@@ -9,6 +9,7 @@ import cn from "clsx";
 import { deleteExpense } from "@/lib/expenses";
 import CustomButton from "@/components/CustomButton";
 import ConfirmModal from "@/components/ConfirmModal";
+import useAuthStore from "@/store/auth.store";
 
 const ExpenseDetails = () => {
   const { expenseId, tripId } = useLocalSearchParams();
@@ -18,14 +19,17 @@ const ExpenseDetails = () => {
     getExpensesForTrip,
     fetchExpenseSharesByExpense,
     getExpenseSharesForExpense,
+    fetchTrips,
   } = useTripsStore();
+
+  const {user} = useAuthStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
 
   const handleCancelInModal = () => {
-    console.log("Cancelled.");
+    //console.log("Cancelled.");
     setShowModal(false);
   };
   // fetch expense shares when the component mounts
@@ -69,13 +73,15 @@ const ExpenseDetails = () => {
   setIsSubmitting(true);
   try {
     await deleteExpense(expenseId as string);
+    fetchExpenses(tripId as string);
+    fetchExpenseSharesByExpense(expenseId as string);
+    fetchTrips(user!.$id as string);
 
     setTimeout(() => {
       router.back();
     }, 100); // React braucht Zeit, sich zu stabilisieren
 
-    // Kein await – async im Hintergrund
-    fetchExpenses(tripId as string);
+    
   } catch (error) {
     Alert.alert("Error", "Could not delete expense");
   } finally {

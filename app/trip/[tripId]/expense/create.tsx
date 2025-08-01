@@ -31,7 +31,7 @@ import Toast from "react-native-toast-message";
 
 const CreateExpense = () => {
   const { tripId } = useLocalSearchParams();
-  const { trips, fetchExpenses } = useTripsStore();
+  const { trips, fetchExpenses, fetchExpenseSharesByTrip, fetchExpenseSharesByExpense } = useTripsStore();
   const trip = trips.find((t) => t.$id === tripId);
 
   const [expense, setExpense] = useState<ExpenseLike>({
@@ -292,6 +292,8 @@ const CreateExpense = () => {
 
       // Update store
       await fetchExpenses(tripId as string);
+      await fetchExpenseSharesByTrip(tripId as string);
+      await fetchExpenseSharesByExpense(expenseId);
 
       Toast.show({
         type: "success",
