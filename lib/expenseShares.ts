@@ -36,7 +36,7 @@ export const getExpenseSharesByTripId = async (tripId: string): Promise<ExpenseS
     const response = await databases.listDocuments<ExpenseShare>(
       appwriteConfig.databaseId!,
       appwriteConfig.expenseSharesCollectionId!,
-      [Query.select(["*"]), Query.equal("tripId", [tripId])]
+      [Query.select(["*"]), Query.equal("tripId", [tripId]), Query.limit(500)]
     );
     return response.documents;
   } catch (error) {

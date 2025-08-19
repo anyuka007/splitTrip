@@ -8,7 +8,7 @@ export const getExpensesByTripId = async (tripId: string): Promise<Expense[]> =>
         const response = await databases.listDocuments<Expense>(
             appwriteConfig.databaseId!,
             appwriteConfig.expensesCollectionId!,
-            [Query.select(["*"]), Query.equal("tripId", tripId), Query.orderDesc("$createdAt")]
+            [Query.select(["*"]), Query.equal("tripId", tripId), Query.orderDesc("date"), Query.limit(500)]
         );
         return response.documents;
     } catch (error) {

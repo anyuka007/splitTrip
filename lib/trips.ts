@@ -47,7 +47,7 @@ export const getUsersTrips = async (userId: string): Promise<Trip[]> => {
         const response = await databases.listDocuments<Trip>(
             appwriteConfig.databaseId!,
             appwriteConfig.tripsCollectionId!,
-            [Query.select(["*"]), Query.equal("ownerId", userId), Query.orderDesc("$createdAt")],
+            [Query.select(["*"]), Query.equal("ownerId", userId), Query.orderDesc("$createdAt"), Query.limit(200)],
         );
         //console.log("User's trips:", JSON.stringify(response.documents, null, 2));
         return response.documents;
