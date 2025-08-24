@@ -53,7 +53,7 @@ const SignUp = () => {
             <CustomButton text="Sign Up" isLoading={isSubmitting} onPress={submit} />
 
             <View className='flex justify-center mt-5 flex-row gap-2'>
-                <Text className='text-regular text-gray-300'>Already have an account?</Text>
+                <Text className='text-regular text-gray-400'>Already have an account?</Text>
                 <Link href="/sign-in" className='text-secondary text-regular font-bold'>Sign In</Link>
             </View>
 

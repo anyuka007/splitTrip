@@ -14,7 +14,7 @@ const AuthLayout = () => {
                 <View className='w-full relative' style={{ height: Dimensions.get("screen").height / 2.25 }}>
                     <ImageBackground source={require("../../assets/images/login-graphic.png")} className="size-full rounded-b-lg" resizeMode="stretch" />
 
-                    <Image source={require("../../assets/images/logo1.png")} className="self-center size-48 absolute -bottom-16 z-10" />
+                    {/* <Image source={require("../../assets/images/logo1.png")} className="self-center size-48 absolute -bottom-16 z-10" /> */}
                 </View>
 
                 <Slot />
