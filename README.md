@@ -8,7 +8,7 @@ A modern mobile application for managing shared travel expenses and trip plannin
 - **Expense Splitting**: Track and split expenses among trip participants
 - **User Authentication**: Secure user registration and login system
 - **Real-time Data**: Powered by Appwrite backend for real-time synchronization
-- **Modern UI**: Responsive design with TailTailwind CSS styling
+- **Modern UI**: Responsive design with NativeWind CSS styling
 
 
 ### 🚧 Planned Features (Coming Soon)
