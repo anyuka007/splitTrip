@@ -2,7 +2,7 @@
 
 A modern mobile application for managing shared travel expenses and trip planning, built with React Native and Expo.
 
-## 📱 Features
+## ✨ Features
 
 - **Trip Management**: Create and organize travel trips with customizable details
 - **Expense Splitting**: Track and split expenses among trip participants
@@ -14,6 +14,12 @@ A modern mobile application for managing shared travel expenses and trip plannin
 ### 🚧 Planned Features (Coming Soon)
 - **Multi-Currency Support**: Support for EUR, USD, UAH, and PLN currencies
 - **Export Reports**: Generate expense reports and summaries
+
+## 📱 Screenshots
+![1](https://github.com/user-attachments/assets/e20b078d-c25f-4eda-8217-1778f15eb545)
+![2](https://github.com/user-attachments/assets/06727107-d1e3-4e45-a959-332f5dc6f6a7)
+
+
 
 ## 🛠️ Tech Stack
 
